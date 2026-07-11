@@ -1,18 +1,18 @@
+using ClientSandBox.Forms;
 using ClientSandBox.Services;
 
-namespace ClientSandBox
+namespace ClientSandBox;
+
+internal static class Program
 {
-    internal static class Program
+    [STAThread]
+    private static void Main()
     {
-        [STAThread]
-        private static void Main()
-        {
-            ApplicationConfiguration.Initialize();
+        ApplicationConfiguration.Initialize();
 
-            AppLogger.Initialize();
-            SettingsService.Load();
+        AppLogger.Initialize();
+        SettingsService.Load();
 
-            Application.Run(new MainForm());
-        }
+        Application.Run(new MainForm());
     }
 }
