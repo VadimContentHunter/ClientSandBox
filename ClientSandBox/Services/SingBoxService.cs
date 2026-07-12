@@ -1,9 +1,12 @@
 ﻿using System.Diagnostics;
+using ClientSandBox.Models;
 
 namespace ClientSandBox.Services;
 
 public static class SingBoxService
 {
+    private const string ServiceName = "sing-box";
+
     private enum ValidationState
     {
         Unknown,
@@ -220,6 +223,102 @@ public static class SingBoxService
             AppLogger.Exception(ex);
 
             return (false, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Получить состояние службы.
+    /// </summary>
+    public static ServiceState GetServiceState()
+    {
+        if (!File.Exists(SettingsService.Current.SingBoxPath))
+        {
+            return new ServiceState
+            {
+                Status = ServiceStatus.Unknown,
+                ErrorMessage = "Не найден sing-box.exe."
+            };
+        }
+
+        try
+        {
+            ProcessStartInfo info = new()
+            {
+                FileName = "sc.exe",
+                Arguments = $"query {ServiceName}",
+
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using Process process = new();
+
+            process.StartInfo = info;
+
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+
+            string error = process.StandardError.ReadToEnd();
+
+            process.WaitForExit();
+
+            string result = $"{output}\n{error}";
+
+            // -------------------------------------------------------
+            // Служба отсутствует.
+            // -------------------------------------------------------
+
+            if (result.Contains("1060"))
+            {
+                return new ServiceState
+                {
+                    Status = ServiceStatus.NotInstalled
+                };
+            }
+
+            // -------------------------------------------------------
+            // Запущена.
+            // -------------------------------------------------------
+
+            if (result.Contains("RUNNING", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ServiceState
+                {
+                    Status = ServiceStatus.Running
+                };
+            }
+
+            // -------------------------------------------------------
+            // Остановлена.
+            // -------------------------------------------------------
+
+            if (result.Contains("STOPPED", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ServiceState
+                {
+                    Status = ServiceStatus.Stopped
+                };
+            }
+
+            return new ServiceState
+            {
+                Status = ServiceStatus.Unknown,
+                ErrorMessage = result.Trim()
+            };
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Exception(ex);
+
+            return new ServiceState
+            {
+                Status = ServiceStatus.Unknown,
+                ErrorMessage = ex.Message
+            };
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿using System.Drawing;
+﻿using ClientSandBox.Models;
 using ClientSandBox.Services;
+using System.Drawing;
 
 namespace ClientSandBox.Forms;
 
@@ -40,7 +41,10 @@ public partial class MainForm : Form
     {
         ValidateSingBoxPath();
         ValidateConfigPath();
+
         UpdateVersion();
+        UpdateServiceStatus();
+
         UpdateButtons();
     }
 
@@ -87,8 +91,20 @@ public partial class MainForm : Form
     {
         bool hasExe = File.Exists(txtSingBox.Text);
         bool hasConfig = File.Exists(txtConfig.Text);
-
         btnCheckConfig.Enabled = hasExe && hasConfig;
+
+        var state = SingBoxService.GetServiceState();
+        btnInstallService.Enabled = !state.IsInstalled;
+        btnUninstallService.Enabled = state.IsInstalled;
+        btnStartService.Enabled = state.IsStopped;
+        btnStopService.Enabled = state.IsRunning;
+        btnRestartService.Enabled = state.IsRunning;
+    }
+
+    private void UpdateServiceStatus()
+    {
+        var state = SingBoxService.GetServiceState();
+        lblServiceStatus.Text = state.DisplayName;
     }
 
     private void PathTextBox_Leave(object? sender, EventArgs e)
@@ -160,5 +176,19 @@ public partial class MainForm : Form
     private void btnCheckConfig_Click(object? sender, EventArgs e)
     {
         ShowError(SingBoxService.CheckConfig());
+    }
+
+    private void btnTest_Click(object? sender, EventArgs e)
+    {
+            var state = SingBoxService.GetServiceState();
+
+            MessageBox.Show(
+                $"Status: {state.Status}\n" +
+                $"Display: {state.DisplayName}\n" +
+                $"Installed: {state.IsInstalled}\n" +
+                $"Running: {state.IsRunning}\n" +
+                $"Stopped: {state.IsStopped}\n" +
+                $"Unknown: {state.IsUnknown}\n" +
+                $"Error: {state.ErrorMessage}");
     }
 }

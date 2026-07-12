@@ -45,6 +45,7 @@
             btnCheckConfig = new Button();
             btnOpenFolder = new Button();
             btnOpenConfig = new Button();
+            btnTest = new Button();
             groupMainService = new GroupBox();
             flowLayoutMainService = new FlowLayoutPanel();
             btnInstallService = new Button();
@@ -245,6 +246,7 @@
             flowLayoutGeneralControl.Controls.Add(btnCheckConfig);
             flowLayoutGeneralControl.Controls.Add(btnOpenFolder);
             flowLayoutGeneralControl.Controls.Add(btnOpenConfig);
+            flowLayoutGeneralControl.Controls.Add(btnTest);
             flowLayoutGeneralControl.Dock = DockStyle.Fill;
             flowLayoutGeneralControl.Location = new Point(3, 24);
             flowLayoutGeneralControl.Name = "flowLayoutGeneralControl";
@@ -285,6 +287,18 @@
             btnOpenConfig.TabIndex = 7;
             btnOpenConfig.Text = "Открыть config.json";
             btnOpenConfig.UseVisualStyleBackColor = true;
+            // 
+            // btnTest
+            // 
+            btnTest.AutoSize = true;
+            btnTest.Location = new Point(533, 11);
+            btnTest.Margin = new Padding(16, 3, 16, 3);
+            btnTest.Name = "btnTest";
+            btnTest.Size = new Size(142, 25);
+            btnTest.TabIndex = 8;
+            btnTest.Text = "TEST";
+            btnTest.UseVisualStyleBackColor = true;
+            btnTest.Click += btnTest_Click;
             // 
             // groupMainService
             // 
@@ -505,5 +519,6 @@
         private Button btnRestartService;
         private Button btnOpenFolder;
         private Button btnOpenConfig;
+        private Button btnTest;
     }
 }
