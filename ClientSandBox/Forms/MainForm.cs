@@ -147,6 +147,13 @@ public partial class MainForm : Form
             result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
     }
 
+    private void ExecuteCommand(Func<(bool Success, string Output)> command)
+    {
+        ShowResult(command());
+
+        RefreshUI();
+    }
+
     private void btnBrowseSingBox_Click(object? sender, EventArgs e)
     {
         using OpenFileDialog dialog = new();
@@ -190,5 +197,30 @@ public partial class MainForm : Form
                 $"Stopped: {state.IsStopped}\n" +
                 $"Unknown: {state.IsUnknown}\n" +
                 $"Error: {state.ErrorMessage}");
+    }
+
+    private void btnInstallService_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxService.InstallService);
+    }
+
+    private void btnUninstallService_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxService.UninstallService);
+    }
+
+    private void btnStartService_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxService.StartService);
+    }
+
+    private void btnStopService_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxService.StopService);
+    }
+
+    private void btnRestartService_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxService.RestartService);
     }
 }

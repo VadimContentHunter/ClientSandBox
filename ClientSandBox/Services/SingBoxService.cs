@@ -41,6 +41,11 @@ public static class SingBoxService
     /// </summary>
     public static (bool Success, string Output) InstallService()
     {
+        var state = GetServiceState();
+
+        if (state.IsInstalled)
+            return (false, "Служба уже установлена.");
+
         return Execute("service install");
     }
 
@@ -49,6 +54,11 @@ public static class SingBoxService
     /// </summary>
     public static (bool Success, string Output) UninstallService()
     {
+        var state = GetServiceState();
+
+        if (!state.IsInstalled)
+            return (false, "Служба не установлена.");
+
         return Execute("service uninstall");
     }
 
@@ -57,6 +67,14 @@ public static class SingBoxService
     /// </summary>
     public static (bool Success, string Output) StartService()
     {
+        var state = GetServiceState();
+
+        if (!state.IsInstalled)
+            return (false, "Служба не установлена.");
+
+        if (state.IsRunning)
+            return (false, "Служба уже запущена.");
+
         var check = CheckConfig();
 
         if (!check.Success)
@@ -70,6 +88,14 @@ public static class SingBoxService
     /// </summary>
     public static (bool Success, string Output) StopService()
     {
+        var state = GetServiceState();
+
+        if (!state.IsInstalled)
+            return (false, "Служба не установлена.");
+
+        if (state.IsStopped)
+            return (false, "Служба уже остановлена.");
+
         return Execute("service stop");
     }
 

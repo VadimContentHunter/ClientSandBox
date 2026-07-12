@@ -337,6 +337,7 @@
             btnInstallService.TabIndex = 0;
             btnInstallService.Text = "Установить службу";
             btnInstallService.UseVisualStyleBackColor = true;
+            btnInstallService.Click += btnInstallService_Click;
             // 
             // btnUninstallService
             // 
@@ -348,6 +349,7 @@
             btnUninstallService.TabIndex = 1;
             btnUninstallService.Text = "Удалить службу";
             btnUninstallService.UseVisualStyleBackColor = true;
+            btnUninstallService.Click += btnUninstallService_Click;
             // 
             // btnStartService
             // 
@@ -359,6 +361,7 @@
             btnStartService.TabIndex = 3;
             btnStartService.Text = "Запустить службу";
             btnStartService.UseVisualStyleBackColor = true;
+            btnStartService.Click += btnStartService_Click;
             // 
             // btnStopService
             // 
@@ -370,6 +373,7 @@
             btnStopService.TabIndex = 4;
             btnStopService.Text = "Остановить службу";
             btnStopService.UseVisualStyleBackColor = true;
+            btnStopService.Click += btnStopService_Click;
             // 
             // btnRestartService
             // 
@@ -381,6 +385,7 @@
             btnRestartService.TabIndex = 5;
             btnRestartService.Text = "Перезапустить службу";
             btnRestartService.UseVisualStyleBackColor = true;
+            btnRestartService.Click += btnRestartService_Click;
             // 
             // tableStatusControl
             // 
