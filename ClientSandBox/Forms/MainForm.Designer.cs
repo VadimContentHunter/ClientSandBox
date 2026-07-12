@@ -60,6 +60,12 @@
             labelPIDCaption = new Label();
             logsPage = new TabPage();
             notifyIcon = new NotifyIcon(components);
+            trayMenu = new ContextMenuStrip(components);
+            miOpen = new ToolStripMenuItem();
+            miStart = new ToolStripMenuItem();
+            miStop = new ToolStripMenuItem();
+            miRestart = new ToolStripMenuItem();
+            miExit = new ToolStripMenuItem();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -70,6 +76,7 @@
             groupSingBox.SuspendLayout();
             flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
+            trayMenu.SuspendLayout();
             SuspendLayout();
             // 
             // tabMain
@@ -453,8 +460,51 @@
             // 
             // notifyIcon
             // 
+            notifyIcon.ContextMenuStrip = trayMenu;
             notifyIcon.Text = "Client SandBox";
             notifyIcon.MouseDoubleClick += notifyIcon_DoubleClick;
+            // 
+            // trayMenu
+            // 
+            trayMenu.Items.AddRange(new ToolStripItem[] { miOpen, miStart, miStop, miRestart, miExit });
+            trayMenu.Name = "trayMenu";
+            trayMenu.Size = new Size(156, 114);
+            trayMenu.Opening += trayMenu_Opening;
+            // 
+            // miOpen
+            // 
+            miOpen.Name = "miOpen";
+            miOpen.Size = new Size(155, 22);
+            miOpen.Text = "Открыть";
+            miOpen.Click += miOpen_Click;
+            // 
+            // miStart
+            // 
+            miStart.Name = "miStart";
+            miStart.Size = new Size(155, 22);
+            miStart.Text = "Запустить";
+            miStart.Click += miStart_Click;
+            // 
+            // miStop
+            // 
+            miStop.Name = "miStop";
+            miStop.Size = new Size(155, 22);
+            miStop.Text = "Остановить";
+            miStop.Click += miStop_Click;
+            // 
+            // miRestart
+            // 
+            miRestart.Name = "miRestart";
+            miRestart.Size = new Size(155, 22);
+            miRestart.Text = "Перезапустить";
+            miRestart.Click += miRestart_Click;
+            // 
+            // miExit
+            // 
+            miExit.Name = "miExit";
+            miExit.Size = new Size(155, 22);
+            miExit.Text = "Выход";
+            miExit.Click += miExit_Click;
             // 
             // MainForm
             // 
@@ -486,6 +536,7 @@
             flowLayoutSingBox.PerformLayout();
             tableStatusControl.ResumeLayout(false);
             tableStatusControl.PerformLayout();
+            trayMenu.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -522,5 +573,11 @@
         private Label lblPidInf;
         private Label labelPIDCaption;
         private NotifyIcon notifyIcon;
+        private ContextMenuStrip trayMenu;
+        private ToolStripMenuItem miOpen;
+        private ToolStripMenuItem miStart;
+        private ToolStripMenuItem miStop;
+        private ToolStripMenuItem miRestart;
+        private ToolStripMenuItem miExit;
     }
 }

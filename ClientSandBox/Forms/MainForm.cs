@@ -317,4 +317,43 @@ public partial class MainForm : Form
             UseShellExecute = true
         });
     }
+
+    private void miOpen_Click(object? sender, EventArgs e)
+    {
+        Show();
+        WindowState = FormWindowState.Normal;
+        ShowInTaskbar = true;
+        BringToFront();
+        Activate();
+        notifyIcon.Visible = false;
+    }
+
+    private void miStart_Click(object sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxRunner.Start);
+    }
+
+    private void miStop_Click(object sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxRunner.Stop);
+    }
+
+    private void miRestart_Click(object sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxRunner.Restart);
+    }
+
+    private void miExit_Click(object sender, EventArgs e)
+    {
+        _allowClose = true;
+        notifyIcon.Visible = false;
+        Close();
+    }
+
+    private void trayMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        miStart.Enabled = btnStartSingBox.Enabled;
+        miStop.Enabled = btnStopSingBox.Enabled;
+        miRestart.Enabled = btnRestartSingBox.Enabled;
+    }
 }
