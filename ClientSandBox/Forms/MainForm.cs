@@ -7,11 +7,20 @@ namespace ClientSandBox.Forms;
 
 public partial class MainForm : Form
 {
+    private readonly System.Windows.Forms.Timer _statusTimer = new();
+    private bool? _lastRunningState;
+    private int? _lastPid;
+    private bool _allowClose;
+
     public MainForm()
     {
         InitializeComponent();
-
         LoadSettings();
+
+        notifyIcon.Icon = Icon;
+        _statusTimer.Interval = 2000;
+        _statusTimer.Tick += StatusTimer_Tick;
+        _statusTimer.Start();
 
         txtSingBox.TextChanged += (_, _) => SaveSettings();
         txtConfig.TextChanged += (_, _) => SaveSettings();
@@ -36,6 +45,42 @@ public partial class MainForm : Form
         SettingsService.Save();
 
         //RefreshUI();
+    }
+
+    private void StatusTimer_Tick(object? sender, EventArgs e)
+    {
+        bool running = SingBoxRunner.IsRunning;
+        int? pid = SingBoxRunner.ProcessId;
+
+        if (_lastRunningState == running &&
+            _lastPid == pid)
+        {
+            return;
+        }
+
+        _lastRunningState = running;
+        _lastPid = pid;
+
+        UpdateStatus();
+        UpdateButtons();
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        _statusTimer.Stop();
+
+        if (!_allowClose &&
+            chkCloseToTray.Checked &&
+            e.CloseReason == CloseReason.UserClosing
+        )
+        {
+            e.Cancel = true;
+            Hide();
+            notifyIcon.Visible = true;
+            return;
+        }
+
+        base.OnFormClosing(e);
     }
 
     private void RefreshUI()
@@ -129,22 +174,6 @@ public partial class MainForm : Form
         }
     }
 
-    private void PathTextBox_Leave(object? sender, EventArgs e)
-    {
-        RefreshUI();
-    }
-
-    private void PathTextBox_KeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.KeyCode != Keys.Enter)
-            return;
-
-        RefreshUI();
-
-        e.Handled = true;
-        e.SuppressKeyPress = true;
-    }
-
     private static bool ShowError((bool Success, string Output) result)
     {
         if (result.Success)
@@ -174,6 +203,32 @@ public partial class MainForm : Form
         ShowResult(command());
 
         RefreshUI();
+    }
+
+    private void PathTextBox_Leave(object? sender, EventArgs e)
+    {
+        RefreshUI();
+    }
+
+    private void PathTextBox_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode != Keys.Enter)
+            return;
+
+        RefreshUI();
+
+        e.Handled = true;
+        e.SuppressKeyPress = true;
+    }
+
+    private void notifyIcon_DoubleClick(object? sender, EventArgs e)
+    {
+        Show();
+        WindowState = FormWindowState.Normal;
+        ShowInTaskbar = true;
+        BringToFront();
+        Activate();
+        notifyIcon.Visible = false;
     }
 
     private void btnBrowseSingBox_Click(object? sender, EventArgs e)
@@ -220,11 +275,6 @@ public partial class MainForm : Form
     private void btnCheckConfig_Click(object? sender, EventArgs e)
     {
         ShowError(SingBoxService.CheckConfig());
-    }
-
-    private void btnRefresh_Click(object? sender, EventArgs e)
-    {
-        RefreshUI();
     }
 
     private void btnOpenSingBoxFolder_Click(object? sender, EventArgs e)

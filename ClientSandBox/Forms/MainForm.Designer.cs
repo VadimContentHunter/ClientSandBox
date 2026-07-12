@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             tabMain = new TabControl();
             settingPage = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -45,7 +46,6 @@
             btnCheckConfig = new Button();
             btnOpenFolder = new Button();
             btnOpenConfig = new Button();
-            btnRefresh = new Button();
             groupSingBox = new GroupBox();
             flowLayoutSingBox = new FlowLayoutPanel();
             btnStartSingBox = new Button();
@@ -59,6 +59,7 @@
             lblPidInf = new Label();
             labelPIDCaption = new Label();
             logsPage = new TabPage();
+            notifyIcon = new NotifyIcon(components);
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -246,7 +247,6 @@
             flowLayoutGeneralControl.Controls.Add(btnCheckConfig);
             flowLayoutGeneralControl.Controls.Add(btnOpenFolder);
             flowLayoutGeneralControl.Controls.Add(btnOpenConfig);
-            flowLayoutGeneralControl.Controls.Add(btnRefresh);
             flowLayoutGeneralControl.Dock = DockStyle.Fill;
             flowLayoutGeneralControl.Location = new Point(3, 24);
             flowLayoutGeneralControl.Name = "flowLayoutGeneralControl";
@@ -289,18 +289,6 @@
             btnOpenConfig.Text = "Открыть config.json";
             btnOpenConfig.UseVisualStyleBackColor = true;
             btnOpenConfig.Click += btnOpenConfig_Click;
-            // 
-            // btnRefresh
-            // 
-            btnRefresh.AutoSize = true;
-            btnRefresh.Location = new Point(533, 11);
-            btnRefresh.Margin = new Padding(16, 3, 16, 3);
-            btnRefresh.Name = "btnRefresh";
-            btnRefresh.Size = new Size(142, 25);
-            btnRefresh.TabIndex = 8;
-            btnRefresh.Text = "Обновить";
-            btnRefresh.UseVisualStyleBackColor = true;
-            btnRefresh.Click += btnRefresh_Click;
             // 
             // groupSingBox
             // 
@@ -463,6 +451,11 @@
             logsPage.Text = "Логи";
             logsPage.UseVisualStyleBackColor = true;
             // 
+            // notifyIcon
+            // 
+            notifyIcon.Text = "Client SandBox";
+            notifyIcon.MouseDoubleClick += notifyIcon_DoubleClick;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -526,8 +519,8 @@
         private Button btnRestartSingBox;
         private Button btnOpenFolder;
         private Button btnOpenConfig;
-        private Button btnRefresh;
         private Label lblPidInf;
         private Label labelPIDCaption;
+        private NotifyIcon notifyIcon;
     }
 }
