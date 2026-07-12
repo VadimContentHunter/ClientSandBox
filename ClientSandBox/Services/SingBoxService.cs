@@ -138,8 +138,8 @@ public static class SingBoxService
         }
         catch (Exception ex)
         {
+            _validationState = ValidationState.Unknown;
             AppLogger.Exception(ex);
-
             return (false, ex.Message);
         }
     }
@@ -201,6 +201,11 @@ public static class SingBoxService
             _validationState = success
                 ? ValidationState.Valid
                 : ValidationState.Invalid;
+
+            if(_validationState == ValidationState.Valid)
+                AppLogger.Info("Проверка исполняемого файла sing-box.");
+            else
+                AppLogger.Error("Проверка исполняемого файла sing-box не удалась.");
 
             return success
                 ? (true, result.Trim())
