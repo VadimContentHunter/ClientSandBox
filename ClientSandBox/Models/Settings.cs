@@ -16,4 +16,14 @@ public class Settings
     /// Сворачивать в трей при закрытии.
     /// </summary>
     public bool CloseToTray { get; set; } = true;
+
+    /// <summary>
+    /// PID процесса sing-box.
+    /// </summary>
+    public int? SingBoxProcessId { get; set; }
+
+    /// <summary>
+    /// Время запуска процесса (UTC).
+    /// </summary>
+    public DateTime? SingBoxStartTimeUtc { get; set; }
 }

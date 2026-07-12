@@ -276,6 +276,7 @@
             btnOpenFolder.TabIndex = 6;
             btnOpenFolder.Text = "Открыть папку";
             btnOpenFolder.UseVisualStyleBackColor = true;
+            btnOpenFolder.Click += btnOpenSingBoxFolder_Click;
             // 
             // btnOpenConfig
             // 
@@ -287,6 +288,7 @@
             btnOpenConfig.TabIndex = 7;
             btnOpenConfig.Text = "Открыть config.json";
             btnOpenConfig.UseVisualStyleBackColor = true;
+            btnOpenConfig.Click += btnOpenConfig_Click;
             // 
             // btnRefresh
             // 
@@ -335,6 +337,7 @@
             btnStartSingBox.TabIndex = 3;
             btnStartSingBox.Text = "Запустить";
             btnStartSingBox.UseVisualStyleBackColor = true;
+            btnStartSingBox.Click += btnStartSingBox_Click;
             // 
             // btnStopSingBox
             // 
@@ -346,6 +349,7 @@
             btnStopSingBox.TabIndex = 4;
             btnStopSingBox.Text = "Остановить";
             btnStopSingBox.UseVisualStyleBackColor = true;
+            btnStopSingBox.Click += btnStopSingBox_Click;
             // 
             // btnRestartSingBox
             // 
@@ -357,6 +361,7 @@
             btnRestartSingBox.TabIndex = 5;
             btnRestartSingBox.Text = "Перезапустить";
             btnRestartSingBox.UseVisualStyleBackColor = true;
+            btnRestartSingBox.Click += btnRestartSingBox_Click;
             // 
             // tableStatusControl
             // 

@@ -7,28 +7,50 @@ namespace ClientSandBox.Services;
 /// </summary>
 public static class SingBoxRunner
 {
-    private static Process? _process;
-
-    /// <summary>
-    /// Время запуска процесса.
-    /// </summary>
-    public static DateTime? StartTime { get; private set; }
-
     /// <summary>
     /// Запущен ли sing-box.
     /// </summary>
-    public static bool IsRunning =>
-        _process is { HasExited: false };
+    public static bool IsRunning => GetProcess() is not null;
 
     /// <summary>
     /// Идентификатор процесса.
     /// </summary>
-    public static int? ProcessId =>
-        IsRunning ? _process!.Id : null;
+    public static int? ProcessId => GetProcess()?.Id;
 
-    /// <summary>
-    /// Запустить sing-box.
-    /// </summary>
+    private static Process? GetProcess()
+    {
+        int? pid = SettingsService.Current.SingBoxProcessId;
+        DateTime? startUtc = SettingsService.Current.SingBoxStartTimeUtc;
+
+        if (pid is null || startUtc is null)
+            return null;
+
+        try
+        {
+            Process process = Process.GetProcessById(pid.Value);
+
+            if (process.HasExited)
+            {
+                ClearProcessInfo();
+                return null;
+            }
+
+            if (process.StartTime.ToUniversalTime() != startUtc.Value)
+            {
+                ClearProcessInfo();
+                process.Dispose();
+                return null;
+            }
+
+            return process;
+        }
+        catch
+        {
+            ClearProcessInfo();
+            return null;
+        }
+    }
+
     public static (bool Success, string Output) Start()
     {
         try
@@ -53,23 +75,21 @@ public static class SingBoxRunner
                 FileName = SettingsService.Current.SingBoxPath,
                 Arguments = $"run -c \"{SettingsService.Current.ConfigPath}\"",
                 WorkingDirectory = workingDirectory,
-
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            _process = Process.Start(info);
-            if (_process is null)
-                return (false, "Не удалось запустить sing-box.");
-            _process.EnableRaisingEvents = true;
-            _process.Exited += (_, _) =>
-            {
-                AppLogger.Info("Sing-box завершил работу.");
-                CleanupProcess();
-            };
+            Process? process = Process.Start(info);
 
-            StartTime = DateTime.Now;
-            AppLogger.Info($"Sing-box запущен. PID={_process.Id}");
+            if (process is null)
+                return (false, "Не удалось запустить sing-box.");
+
+            SettingsService.Current.SingBoxProcessId = process.Id;
+            SettingsService.Current.SingBoxStartTimeUtc = process.StartTime.ToUniversalTime();
+            SettingsService.Save();
+
+            AppLogger.Info($"Sing-box запущен. PID={process.Id}");
+
             return (true, "Sing-box успешно запущен.");
         }
         catch (Exception ex)
@@ -79,21 +99,23 @@ public static class SingBoxRunner
         }
     }
 
-    /// <summary>
-    /// Остановить sing-box.
-    /// </summary>
     public static (bool Success, string Output) Stop()
     {
         try
         {
-            if (!IsRunning)
+            Process? process = GetProcess();
+
+            if (process is null)
                 return (false, "Sing-box не запущен.");
 
-            _process!.Kill(true);
-            _process.WaitForExit();
+            process.Kill(true);
+            process.WaitForExit();
+            process.Dispose();
+
+            ClearProcessInfo();
 
             AppLogger.Info("Sing-box остановлен пользователем.");
-            CleanupProcess();
+
             return (true, "Sing-box успешно остановлен.");
         }
         catch (Exception ex)
@@ -103,33 +125,20 @@ public static class SingBoxRunner
         }
     }
 
-    /// <summary>
-    /// Перезапустить sing-box.
-    /// </summary>
     public static (bool Success, string Output) Restart()
     {
-        var stopResult = Stop();
-        if (!stopResult.Success)
-            return stopResult;
+        var stop = Stop();
+
+        if (!stop.Success)
+            return stop;
 
         return Start();
     }
 
-    /// <summary>
-    /// Освобождение ресурсов процесса.
-    /// </summary>
-    private static void CleanupProcess()
+    private static void ClearProcessInfo()
     {
-        try
-        {
-            _process?.Dispose();
-        }
-        catch
-        {
-            // Игнорируем ошибки освобождения ресурсов.
-        }
-
-        _process = null;
-        StartTime = null;
+        SettingsService.Current.SingBoxProcessId = null;
+        SettingsService.Current.SingBoxStartTimeUtc = null;
+        SettingsService.Save();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ClientSandBox.Models;
 using ClientSandBox.Services;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace ClientSandBox.Forms;
@@ -90,7 +91,26 @@ public partial class MainForm : Form
     {
         bool hasExe = File.Exists(txtSingBox.Text);
         bool hasConfig = File.Exists(txtConfig.Text);
-        btnCheckConfig.Enabled = hasExe && hasConfig;
+
+        bool canStart =
+            hasExe &&
+            hasConfig &&
+            !SingBoxRunner.IsRunning;
+
+        bool canStop =
+            SingBoxRunner.IsRunning;
+
+        btnCheckConfig.Enabled =
+            hasExe && hasConfig;
+
+        btnStartSingBox.Enabled =
+            canStart;
+
+        btnStopSingBox.Enabled =
+            canStop;
+
+        btnRestartSingBox.Enabled =
+            canStop;
     }
 
     private void UpdateStatus()
@@ -99,10 +119,12 @@ public partial class MainForm : Form
         {
             lblStatusSingBox.Text = "🟢 Запущен";
             lblPidInf.Text = SingBoxRunner.ProcessId?.ToString();
+            lblStatusSingBox.ForeColor = Color.Green;
         }
         else
         {
             lblStatusSingBox.Text = "🔴 Не запущен";
+            lblStatusSingBox.ForeColor = Color.Red;
             lblPidInf.Text = "—";
         }
     }
@@ -180,6 +202,21 @@ public partial class MainForm : Form
         txtConfig.Text = dialog.FileName;
     }
 
+    private void btnStartSingBox_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxRunner.Start);
+    }
+
+    private void btnStopSingBox_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxRunner.Stop);
+    }
+
+    private void btnRestartSingBox_Click(object? sender, EventArgs e)
+    {
+        ExecuteCommand(SingBoxRunner.Restart);
+    }
+
     private void btnCheckConfig_Click(object? sender, EventArgs e)
     {
         ShowError(SingBoxService.CheckConfig());
@@ -188,5 +225,46 @@ public partial class MainForm : Form
     private void btnRefresh_Click(object? sender, EventArgs e)
     {
         RefreshUI();
+    }
+
+    private void btnOpenSingBoxFolder_Click(object? sender, EventArgs e)
+    {
+        if (!File.Exists(txtSingBox.Text))
+        {
+            MessageBox.Show(
+                "Файл sing-box.exe не найден.",
+                "Ошибка",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = "explorer.exe",
+            Arguments = $"/select,\"{txtSingBox.Text}\"",
+            UseShellExecute = true
+        });
+    }
+
+    private void btnOpenConfig_Click(object? sender, EventArgs e)
+    {
+        if (!File.Exists(txtConfig.Text))
+        {
+            MessageBox.Show(
+                "Файл config.json не найден.",
+                "Ошибка",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = txtConfig.Text,
+            UseShellExecute = true
+        });
     }
 }
