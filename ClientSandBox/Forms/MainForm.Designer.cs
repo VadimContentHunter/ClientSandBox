@@ -45,19 +45,19 @@
             btnCheckConfig = new Button();
             btnOpenFolder = new Button();
             btnOpenConfig = new Button();
-            btnTest = new Button();
-            groupMainService = new GroupBox();
-            flowLayoutMainService = new FlowLayoutPanel();
-            btnInstallService = new Button();
-            btnUninstallService = new Button();
-            btnStartService = new Button();
-            btnStopService = new Button();
-            btnRestartService = new Button();
+            btnRefresh = new Button();
+            groupSingBox = new GroupBox();
+            flowLayoutSingBox = new FlowLayoutPanel();
+            btnStartSingBox = new Button();
+            btnStopSingBox = new Button();
+            btnRestartSingBox = new Button();
             tableStatusControl = new TableLayoutPanel();
-            lblServiceStatus = new Label();
-            lblServiceCaption = new Label();
+            lblStatusSingBox = new Label();
             lblVersionCaption = new Label();
             lblVersion = new Label();
+            labelStatusSingBoxCaption = new Label();
+            lblPidInf = new Label();
+            labelPIDCaption = new Label();
             logsPage = new TabPage();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
@@ -66,8 +66,8 @@
             controlPage.SuspendLayout();
             groupGeneralControl.SuspendLayout();
             flowLayoutGeneralControl.SuspendLayout();
-            groupMainService.SuspendLayout();
-            flowLayoutMainService.SuspendLayout();
+            groupSingBox.SuspendLayout();
+            flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
             SuspendLayout();
             // 
@@ -217,7 +217,7 @@
             // controlPage
             // 
             controlPage.Controls.Add(groupGeneralControl);
-            controlPage.Controls.Add(groupMainService);
+            controlPage.Controls.Add(groupSingBox);
             controlPage.Controls.Add(tableStatusControl);
             controlPage.Location = new Point(4, 24);
             controlPage.Name = "controlPage";
@@ -232,7 +232,7 @@
             groupGeneralControl.AutoSize = true;
             groupGeneralControl.Controls.Add(flowLayoutGeneralControl);
             groupGeneralControl.Dock = DockStyle.Top;
-            groupGeneralControl.Location = new Point(3, 193);
+            groupGeneralControl.Location = new Point(3, 236);
             groupGeneralControl.Name = "groupGeneralControl";
             groupGeneralControl.Padding = new Padding(3, 8, 3, 20);
             groupGeneralControl.Size = new Size(870, 91);
@@ -246,7 +246,7 @@
             flowLayoutGeneralControl.Controls.Add(btnCheckConfig);
             flowLayoutGeneralControl.Controls.Add(btnOpenFolder);
             flowLayoutGeneralControl.Controls.Add(btnOpenConfig);
-            flowLayoutGeneralControl.Controls.Add(btnTest);
+            flowLayoutGeneralControl.Controls.Add(btnRefresh);
             flowLayoutGeneralControl.Dock = DockStyle.Fill;
             flowLayoutGeneralControl.Location = new Point(3, 24);
             flowLayoutGeneralControl.Name = "flowLayoutGeneralControl";
@@ -288,166 +288,165 @@
             btnOpenConfig.Text = "Открыть config.json";
             btnOpenConfig.UseVisualStyleBackColor = true;
             // 
-            // btnTest
+            // btnRefresh
             // 
-            btnTest.AutoSize = true;
-            btnTest.Location = new Point(533, 11);
-            btnTest.Margin = new Padding(16, 3, 16, 3);
-            btnTest.Name = "btnTest";
-            btnTest.Size = new Size(142, 25);
-            btnTest.TabIndex = 8;
-            btnTest.Text = "TEST";
-            btnTest.UseVisualStyleBackColor = true;
-            btnTest.Click += btnTest_Click;
+            btnRefresh.AutoSize = true;
+            btnRefresh.Location = new Point(533, 11);
+            btnRefresh.Margin = new Padding(16, 3, 16, 3);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(142, 25);
+            btnRefresh.TabIndex = 8;
+            btnRefresh.Text = "Обновить";
+            btnRefresh.UseVisualStyleBackColor = true;
+            btnRefresh.Click += btnRefresh_Click;
             // 
-            // groupMainService
+            // groupSingBox
             // 
-            groupMainService.Controls.Add(flowLayoutMainService);
-            groupMainService.Dock = DockStyle.Top;
-            groupMainService.Location = new Point(3, 103);
-            groupMainService.Name = "groupMainService";
-            groupMainService.Padding = new Padding(3, 8, 3, 20);
-            groupMainService.Size = new Size(870, 90);
-            groupMainService.TabIndex = 1;
-            groupMainService.TabStop = false;
-            groupMainService.Text = "Основное управление службой";
+            groupSingBox.Controls.Add(flowLayoutSingBox);
+            groupSingBox.Dock = DockStyle.Top;
+            groupSingBox.Location = new Point(3, 146);
+            groupSingBox.Name = "groupSingBox";
+            groupSingBox.Padding = new Padding(3, 8, 3, 20);
+            groupSingBox.Size = new Size(870, 90);
+            groupSingBox.TabIndex = 1;
+            groupSingBox.TabStop = false;
+            groupSingBox.Text = "Управление sing-box";
             // 
-            // flowLayoutMainService
+            // flowLayoutSingBox
             // 
-            flowLayoutMainService.AutoSize = true;
-            flowLayoutMainService.Controls.Add(btnInstallService);
-            flowLayoutMainService.Controls.Add(btnUninstallService);
-            flowLayoutMainService.Controls.Add(btnStartService);
-            flowLayoutMainService.Controls.Add(btnStopService);
-            flowLayoutMainService.Controls.Add(btnRestartService);
-            flowLayoutMainService.Dock = DockStyle.Fill;
-            flowLayoutMainService.Location = new Point(3, 24);
-            flowLayoutMainService.Name = "flowLayoutMainService";
-            flowLayoutMainService.Padding = new Padding(0, 8, 0, 8);
-            flowLayoutMainService.Size = new Size(864, 46);
-            flowLayoutMainService.TabIndex = 0;
+            flowLayoutSingBox.AutoSize = true;
+            flowLayoutSingBox.Controls.Add(btnStartSingBox);
+            flowLayoutSingBox.Controls.Add(btnStopSingBox);
+            flowLayoutSingBox.Controls.Add(btnRestartSingBox);
+            flowLayoutSingBox.Dock = DockStyle.Fill;
+            flowLayoutSingBox.Location = new Point(3, 24);
+            flowLayoutSingBox.Name = "flowLayoutSingBox";
+            flowLayoutSingBox.Padding = new Padding(0, 8, 0, 8);
+            flowLayoutSingBox.Size = new Size(864, 46);
+            flowLayoutSingBox.TabIndex = 0;
             // 
-            // btnInstallService
+            // btnStartSingBox
             // 
-            btnInstallService.AutoSize = true;
-            btnInstallService.Location = new Point(16, 11);
-            btnInstallService.Margin = new Padding(16, 3, 16, 3);
-            btnInstallService.Name = "btnInstallService";
-            btnInstallService.Size = new Size(139, 25);
-            btnInstallService.TabIndex = 0;
-            btnInstallService.Text = "Установить службу";
-            btnInstallService.UseVisualStyleBackColor = true;
-            btnInstallService.Click += btnInstallService_Click;
+            btnStartSingBox.AutoSize = true;
+            btnStartSingBox.Location = new Point(16, 11);
+            btnStartSingBox.Margin = new Padding(16, 3, 16, 3);
+            btnStartSingBox.Name = "btnStartSingBox";
+            btnStartSingBox.Size = new Size(137, 25);
+            btnStartSingBox.TabIndex = 3;
+            btnStartSingBox.Text = "Запустить";
+            btnStartSingBox.UseVisualStyleBackColor = true;
             // 
-            // btnUninstallService
+            // btnStopSingBox
             // 
-            btnUninstallService.AutoSize = true;
-            btnUninstallService.Location = new Point(187, 11);
-            btnUninstallService.Margin = new Padding(16, 3, 16, 3);
-            btnUninstallService.Name = "btnUninstallService";
-            btnUninstallService.Size = new Size(121, 25);
-            btnUninstallService.TabIndex = 1;
-            btnUninstallService.Text = "Удалить службу";
-            btnUninstallService.UseVisualStyleBackColor = true;
-            btnUninstallService.Click += btnUninstallService_Click;
+            btnStopSingBox.AutoSize = true;
+            btnStopSingBox.Location = new Point(185, 11);
+            btnStopSingBox.Margin = new Padding(16, 3, 16, 3);
+            btnStopSingBox.Name = "btnStopSingBox";
+            btnStopSingBox.Size = new Size(137, 25);
+            btnStopSingBox.TabIndex = 4;
+            btnStopSingBox.Text = "Остановить";
+            btnStopSingBox.UseVisualStyleBackColor = true;
             // 
-            // btnStartService
+            // btnRestartSingBox
             // 
-            btnStartService.AutoSize = true;
-            btnStartService.Location = new Point(340, 11);
-            btnStartService.Margin = new Padding(16, 3, 16, 3);
-            btnStartService.Name = "btnStartService";
-            btnStartService.Size = new Size(137, 25);
-            btnStartService.TabIndex = 3;
-            btnStartService.Text = "Запустить службу";
-            btnStartService.UseVisualStyleBackColor = true;
-            btnStartService.Click += btnStartService_Click;
-            // 
-            // btnStopService
-            // 
-            btnStopService.AutoSize = true;
-            btnStopService.Location = new Point(509, 11);
-            btnStopService.Margin = new Padding(16, 3, 16, 3);
-            btnStopService.Name = "btnStopService";
-            btnStopService.Size = new Size(137, 25);
-            btnStopService.TabIndex = 4;
-            btnStopService.Text = "Остановить службу";
-            btnStopService.UseVisualStyleBackColor = true;
-            btnStopService.Click += btnStopService_Click;
-            // 
-            // btnRestartService
-            // 
-            btnRestartService.AutoSize = true;
-            btnRestartService.Location = new Point(678, 11);
-            btnRestartService.Margin = new Padding(16, 3, 16, 3);
-            btnRestartService.Name = "btnRestartService";
-            btnRestartService.Size = new Size(142, 25);
-            btnRestartService.TabIndex = 5;
-            btnRestartService.Text = "Перезапустить службу";
-            btnRestartService.UseVisualStyleBackColor = true;
-            btnRestartService.Click += btnRestartService_Click;
+            btnRestartSingBox.AutoSize = true;
+            btnRestartSingBox.Location = new Point(354, 11);
+            btnRestartSingBox.Margin = new Padding(16, 3, 16, 3);
+            btnRestartSingBox.Name = "btnRestartSingBox";
+            btnRestartSingBox.Size = new Size(142, 25);
+            btnRestartSingBox.TabIndex = 5;
+            btnRestartSingBox.Text = "Перезапустить";
+            btnRestartSingBox.UseVisualStyleBackColor = true;
             // 
             // tableStatusControl
             // 
             tableStatusControl.AutoSize = true;
             tableStatusControl.ColumnCount = 2;
+            tableStatusControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
             tableStatusControl.ColumnStyles.Add(new ColumnStyle());
-            tableStatusControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 739F));
-            tableStatusControl.Controls.Add(lblServiceStatus, 1, 0);
-            tableStatusControl.Controls.Add(lblServiceCaption, 0, 0);
-            tableStatusControl.Controls.Add(lblVersionCaption, 0, 1);
-            tableStatusControl.Controls.Add(lblVersion, 1, 1);
+            tableStatusControl.Controls.Add(lblStatusSingBox, 1, 0);
+            tableStatusControl.Controls.Add(lblVersionCaption, 0, 2);
+            tableStatusControl.Controls.Add(lblVersion, 1, 2);
+            tableStatusControl.Controls.Add(labelStatusSingBoxCaption, 0, 0);
+            tableStatusControl.Controls.Add(lblPidInf, 1, 1);
+            tableStatusControl.Controls.Add(labelPIDCaption, 0, 1);
             tableStatusControl.Dock = DockStyle.Top;
             tableStatusControl.Location = new Point(3, 3);
             tableStatusControl.Name = "tableStatusControl";
             tableStatusControl.Padding = new Padding(0, 20, 0, 30);
-            tableStatusControl.RowCount = 2;
+            tableStatusControl.RowCount = 3;
             tableStatusControl.RowStyles.Add(new RowStyle());
             tableStatusControl.RowStyles.Add(new RowStyle());
-            tableStatusControl.Size = new Size(870, 100);
+            tableStatusControl.RowStyles.Add(new RowStyle());
+            tableStatusControl.Size = new Size(870, 143);
             tableStatusControl.TabIndex = 0;
             // 
-            // lblServiceStatus
+            // lblStatusSingBox
             // 
-            lblServiceStatus.AutoSize = true;
-            lblServiceStatus.Location = new Point(127, 20);
-            lblServiceStatus.Margin = new Padding(3, 0, 3, 10);
-            lblServiceStatus.Name = "lblServiceStatus";
-            lblServiceStatus.Size = new Size(71, 15);
-            lblServiceStatus.TabIndex = 0;
-            lblServiceStatus.Text = "Неизвестно";
-            // 
-            // lblServiceCaption
-            // 
-            lblServiceCaption.AutoSize = true;
-            lblServiceCaption.Location = new Point(3, 20);
-            lblServiceCaption.Margin = new Padding(3, 0, 3, 10);
-            lblServiceCaption.Name = "lblServiceCaption";
-            lblServiceCaption.Padding = new Padding(0, 0, 20, 0);
-            lblServiceCaption.Size = new Size(113, 15);
-            lblServiceCaption.TabIndex = 1;
-            lblServiceCaption.Text = "Статус службы:";
+            lblStatusSingBox.Dock = DockStyle.Fill;
+            lblStatusSingBox.Location = new Point(143, 28);
+            lblStatusSingBox.Margin = new Padding(3, 8, 3, 8);
+            lblStatusSingBox.Name = "lblStatusSingBox";
+            lblStatusSingBox.Size = new Size(740, 15);
+            lblStatusSingBox.TabIndex = 0;
+            lblStatusSingBox.Text = "Не запущен";
+            lblStatusSingBox.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblVersionCaption
             // 
-            lblVersionCaption.AutoSize = true;
-            lblVersionCaption.Location = new Point(3, 55);
-            lblVersionCaption.Margin = new Padding(3, 10, 3, 0);
+            lblVersionCaption.Dock = DockStyle.Top;
+            lblVersionCaption.Location = new Point(3, 90);
+            lblVersionCaption.Margin = new Padding(3, 8, 3, 8);
             lblVersionCaption.Name = "lblVersionCaption";
-            lblVersionCaption.Padding = new Padding(0, 0, 20, 0);
-            lblVersionCaption.Size = new Size(118, 15);
+            lblVersionCaption.Size = new Size(134, 15);
             lblVersionCaption.TabIndex = 2;
             lblVersionCaption.Text = "Версия sing-box:";
+            lblVersionCaption.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblVersion
             // 
             lblVersion.AutoSize = true;
-            lblVersion.Location = new Point(127, 55);
-            lblVersion.Margin = new Padding(3, 10, 3, 0);
+            lblVersion.Dock = DockStyle.Fill;
+            lblVersion.Location = new Point(143, 90);
+            lblVersion.Margin = new Padding(3, 8, 3, 8);
             lblVersion.Name = "lblVersion";
-            lblVersion.Size = new Size(19, 15);
+            lblVersion.Size = new Size(740, 15);
             lblVersion.TabIndex = 3;
             lblVersion.Text = "—";
+            lblVersion.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // labelStatusSingBoxCaption
+            // 
+            labelStatusSingBoxCaption.Dock = DockStyle.Fill;
+            labelStatusSingBoxCaption.Location = new Point(3, 28);
+            labelStatusSingBoxCaption.Margin = new Padding(3, 8, 3, 8);
+            labelStatusSingBoxCaption.Name = "labelStatusSingBoxCaption";
+            labelStatusSingBoxCaption.Size = new Size(134, 15);
+            labelStatusSingBoxCaption.TabIndex = 1;
+            labelStatusSingBoxCaption.Text = "Статус sing-box:";
+            labelStatusSingBoxCaption.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblPidInf
+            // 
+            lblPidInf.Dock = DockStyle.Fill;
+            lblPidInf.Location = new Point(143, 59);
+            lblPidInf.Margin = new Padding(3, 8, 3, 8);
+            lblPidInf.Name = "lblPidInf";
+            lblPidInf.Size = new Size(740, 15);
+            lblPidInf.TabIndex = 5;
+            lblPidInf.Text = "—";
+            lblPidInf.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // labelPIDCaption
+            // 
+            labelPIDCaption.Dock = DockStyle.Fill;
+            labelPIDCaption.Location = new Point(3, 59);
+            labelPIDCaption.Margin = new Padding(3, 8, 3, 8);
+            labelPIDCaption.Name = "labelPIDCaption";
+            labelPIDCaption.Size = new Size(134, 15);
+            labelPIDCaption.TabIndex = 4;
+            labelPIDCaption.Text = "PID:";
+            labelPIDCaption.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // logsPage
             // 
@@ -483,10 +482,10 @@
             groupGeneralControl.PerformLayout();
             flowLayoutGeneralControl.ResumeLayout(false);
             flowLayoutGeneralControl.PerformLayout();
-            groupMainService.ResumeLayout(false);
-            groupMainService.PerformLayout();
-            flowLayoutMainService.ResumeLayout(false);
-            flowLayoutMainService.PerformLayout();
+            groupSingBox.ResumeLayout(false);
+            groupSingBox.PerformLayout();
+            flowLayoutSingBox.ResumeLayout(false);
+            flowLayoutSingBox.PerformLayout();
             tableStatusControl.ResumeLayout(false);
             tableStatusControl.PerformLayout();
             ResumeLayout(false);
@@ -508,22 +507,22 @@
         private TableLayoutPanel tableSettingPaths;
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableStatusControl;
-        private Label lblServiceStatus;
-        private Label lblServiceCaption;
+        private Label lblStatusSingBox;
+        private Label labelStatusSingBoxCaption;
         private Label lblVersionCaption;
         private Label lblVersion;
-        private GroupBox groupMainService;
-        private FlowLayoutPanel flowLayoutMainService;
-        private Button btnInstallService;
+        private GroupBox groupSingBox;
+        private FlowLayoutPanel flowLayoutSingBox;
         private GroupBox groupGeneralControl;
         private FlowLayoutPanel flowLayoutGeneralControl;
         private Button btnCheckConfig;
-        private Button btnUninstallService;
-        private Button btnStartService;
-        private Button btnStopService;
-        private Button btnRestartService;
+        private Button btnStartSingBox;
+        private Button btnStopSingBox;
+        private Button btnRestartSingBox;
         private Button btnOpenFolder;
         private Button btnOpenConfig;
-        private Button btnTest;
+        private Button btnRefresh;
+        private Label lblPidInf;
+        private Label labelPIDCaption;
     }
 }
