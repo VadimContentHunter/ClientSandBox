@@ -198,6 +198,16 @@ public partial class MainForm : Form
             result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
     }
 
+    private void ShowMainWindow()
+    {
+        Show();
+        WindowState = FormWindowState.Normal;
+        ShowInTaskbar = true;
+        BringToFront();
+        Activate();
+        notifyIcon.Visible = false;
+    }
+
     private void ExecuteCommand(Func<(bool Success, string Output)> command)
     {
         ShowResult(command());
@@ -219,16 +229,6 @@ public partial class MainForm : Form
 
         e.Handled = true;
         e.SuppressKeyPress = true;
-    }
-
-    private void notifyIcon_DoubleClick(object? sender, EventArgs e)
-    {
-        Show();
-        WindowState = FormWindowState.Normal;
-        ShowInTaskbar = true;
-        BringToFront();
-        Activate();
-        notifyIcon.Visible = false;
     }
 
     private void btnBrowseSingBox_Click(object? sender, EventArgs e)
@@ -318,14 +318,14 @@ public partial class MainForm : Form
         });
     }
 
+    private void notifyIcon_DoubleClick(object? sender, EventArgs e)
+    {
+        ShowMainWindow();
+    }
+
     private void miOpen_Click(object? sender, EventArgs e)
     {
-        Show();
-        WindowState = FormWindowState.Normal;
-        ShowInTaskbar = true;
-        BringToFront();
-        Activate();
-        notifyIcon.Visible = false;
+        ShowMainWindow();
     }
 
     private void miStart_Click(object sender, EventArgs e)
