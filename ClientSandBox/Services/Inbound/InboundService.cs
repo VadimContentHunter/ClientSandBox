@@ -1,9 +1,7 @@
-﻿using ClientSandBox.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
+using ClientSandBox.Models;
 using ClientSandBox.Services;
+using ClientSandBox.Services.Inbound.Validators;
 
 namespace ClientSandBox.Services.Inbound;
 
@@ -13,10 +11,20 @@ namespace ClientSandBox.Services.Inbound;
 public static class InboundService
 {
     /// <summary>
-    /// Считывает список Inbound из конфигурации.
+    /// Список анализаторов Inbound.
+    /// </summary>
+    private static readonly IReadOnlyList<IInboundValidator> Validators =
+    [
+        new SystemProxyValidator(),
+        new TunValidator(),
+        new UnknownValidator()
+    ];
+
+    /// <summary>
+    /// Загружает и анализирует список Inbound.
     /// </summary>
     /// <param name="configPath">Путь к config.json.</param>
-    /// <returns>Список найденных Inbound.</returns>
+    /// <returns>Список Inbound.</returns>
     public static List<InboundInfo> Load(string configPath)
     {
         JsonDocument? document = ConfigReader.Read(configPath);
@@ -28,7 +36,24 @@ public static class InboundService
 
         using (document)
         {
-            return InboundReader.Read(document);
+            List<InboundInfo> inbounds = InboundReader.Read(document);
+            Analyze(inbounds);
+            return inbounds;
+        }
+    }
+
+    /// <summary>
+    /// Выполняет анализ всех Inbound.
+    /// </summary>
+    /// <param name="inbounds">Список Inbound.</param>
+    private static void Analyze(IEnumerable<InboundInfo> inbounds)
+    {
+        foreach (InboundInfo inbound in inbounds)
+        {
+            foreach (IInboundValidator validator in Validators)
+            {
+                validator.Analyze(inbound);
+            }
         }
     }
 }

@@ -58,6 +58,10 @@
             labelStatusSingBoxCaption = new Label();
             lblPidInf = new Label();
             labelPIDCaption = new Label();
+            connectionsPage = new TabPage();
+            tableConnectionsHeader = new TableLayoutPanel();
+            btnRefreshConnections = new Button();
+            lblLastUpdateCaption = new Label();
             logsPage = new TabPage();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
@@ -66,6 +70,13 @@
             miStop = new ToolStripMenuItem();
             miRestart = new ToolStripMenuItem();
             miExit = new ToolStripMenuItem();
+            gridConnections = new DataGridView();
+            colSelected = new DataGridViewCheckBoxColumn();
+            colTag = new DataGridViewTextBoxColumn();
+            colType = new DataGridViewTextBoxColumn();
+            colAddress = new DataGridViewTextBoxColumn();
+            colStatus = new DataGridViewTextBoxColumn();
+            lblLastUpdate = new Label();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -76,13 +87,17 @@
             groupSingBox.SuspendLayout();
             flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
+            connectionsPage.SuspendLayout();
+            tableConnectionsHeader.SuspendLayout();
             trayMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
             SuspendLayout();
             // 
             // tabMain
             // 
             tabMain.Controls.Add(settingPage);
             tabMain.Controls.Add(controlPage);
+            tabMain.Controls.Add(connectionsPage);
             tabMain.Controls.Add(logsPage);
             tabMain.Dock = DockStyle.Fill;
             tabMain.Location = new Point(0, 0);
@@ -448,6 +463,58 @@
             labelPIDCaption.Text = "PID:";
             labelPIDCaption.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // connectionsPage
+            // 
+            connectionsPage.Controls.Add(gridConnections);
+            connectionsPage.Controls.Add(tableConnectionsHeader);
+            connectionsPage.Location = new Point(4, 24);
+            connectionsPage.Name = "connectionsPage";
+            connectionsPage.Padding = new Padding(3);
+            connectionsPage.Size = new Size(876, 533);
+            connectionsPage.TabIndex = 3;
+            connectionsPage.Text = "Подключения";
+            connectionsPage.UseVisualStyleBackColor = true;
+            // 
+            // tableConnectionsHeader
+            // 
+            tableConnectionsHeader.AutoSize = true;
+            tableConnectionsHeader.ColumnCount = 3;
+            tableConnectionsHeader.ColumnStyles.Add(new ColumnStyle());
+            tableConnectionsHeader.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableConnectionsHeader.ColumnStyles.Add(new ColumnStyle());
+            tableConnectionsHeader.Controls.Add(btnRefreshConnections, 2, 0);
+            tableConnectionsHeader.Controls.Add(lblLastUpdateCaption, 0, 0);
+            tableConnectionsHeader.Controls.Add(lblLastUpdate, 1, 0);
+            tableConnectionsHeader.Dock = DockStyle.Top;
+            tableConnectionsHeader.Location = new Point(3, 3);
+            tableConnectionsHeader.Name = "tableConnectionsHeader";
+            tableConnectionsHeader.Padding = new Padding(0, 20, 0, 15);
+            tableConnectionsHeader.RowCount = 1;
+            tableConnectionsHeader.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableConnectionsHeader.Size = new Size(870, 66);
+            tableConnectionsHeader.TabIndex = 0;
+            // 
+            // btnRefreshConnections
+            // 
+            btnRefreshConnections.Anchor = AnchorStyles.Right;
+            btnRefreshConnections.AutoSize = true;
+            btnRefreshConnections.Location = new Point(792, 23);
+            btnRefreshConnections.Name = "btnRefreshConnections";
+            btnRefreshConnections.Size = new Size(75, 25);
+            btnRefreshConnections.TabIndex = 1;
+            btnRefreshConnections.Text = "Обновить";
+            btnRefreshConnections.UseVisualStyleBackColor = true;
+            // 
+            // lblLastUpdateCaption
+            // 
+            lblLastUpdateCaption.Anchor = AnchorStyles.Left;
+            lblLastUpdateCaption.AutoSize = true;
+            lblLastUpdateCaption.Location = new Point(3, 28);
+            lblLastUpdateCaption.Name = "lblLastUpdateCaption";
+            lblLastUpdateCaption.Size = new Size(143, 15);
+            lblLastUpdateCaption.TabIndex = 0;
+            lblLastUpdateCaption.Text = "Последнее обновление: ";
+            // 
             // logsPage
             // 
             logsPage.Location = new Point(4, 24);
@@ -506,6 +573,77 @@
             miExit.Text = "Выход";
             miExit.Click += miExit_Click;
             // 
+            // gridConnections
+            // 
+            gridConnections.AllowUserToAddRows = false;
+            gridConnections.AllowUserToDeleteRows = false;
+            gridConnections.AllowUserToResizeRows = false;
+            gridConnections.BackgroundColor = SystemColors.Window;
+            gridConnections.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
+            gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            gridConnections.Columns.AddRange(new DataGridViewColumn[] { colSelected, colTag, colType, colAddress, colStatus });
+            gridConnections.Dock = DockStyle.Fill;
+            gridConnections.Location = new Point(3, 69);
+            gridConnections.MultiSelect = false;
+            gridConnections.Name = "gridConnections";
+            gridConnections.RowHeadersVisible = false;
+            gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            gridConnections.Size = new Size(870, 461);
+            gridConnections.TabIndex = 1;
+            // 
+            // colSelected
+            // 
+            colSelected.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colSelected.HeaderText = "☑";
+            colSelected.MinimumWidth = 55;
+            colSelected.Name = "colSelected";
+            colSelected.Resizable = DataGridViewTriState.False;
+            colSelected.Width = 55;
+            // 
+            // colTag
+            // 
+            colTag.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colTag.HeaderText = "Tag";
+            colTag.MinimumWidth = 120;
+            colTag.Name = "colTag";
+            colTag.ReadOnly = true;
+            colTag.Width = 150;
+            // 
+            // colType
+            // 
+            colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colType.HeaderText = "Тип";
+            colType.MinimumWidth = 90;
+            colType.Name = "colType";
+            colType.ReadOnly = true;
+            colType.Width = 90;
+            // 
+            // colAddress
+            // 
+            colAddress.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            colAddress.HeaderText = "Адрес подключения";
+            colAddress.Name = "colAddress";
+            colAddress.ReadOnly = true;
+            // 
+            // colStatus
+            // 
+            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colStatus.HeaderText = "Состояние";
+            colStatus.MinimumWidth = 180;
+            colStatus.Name = "colStatus";
+            colStatus.ReadOnly = true;
+            colStatus.Width = 200;
+            // 
+            // lblLastUpdate
+            // 
+            lblLastUpdate.Anchor = AnchorStyles.Left;
+            lblLastUpdate.AutoSize = true;
+            lblLastUpdate.Location = new Point(152, 28);
+            lblLastUpdate.Name = "lblLastUpdate";
+            lblLastUpdate.Size = new Size(19, 15);
+            lblLastUpdate.TabIndex = 2;
+            lblLastUpdate.Text = "—";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -536,7 +674,12 @@
             flowLayoutSingBox.PerformLayout();
             tableStatusControl.ResumeLayout(false);
             tableStatusControl.PerformLayout();
+            connectionsPage.ResumeLayout(false);
+            connectionsPage.PerformLayout();
+            tableConnectionsHeader.ResumeLayout(false);
+            tableConnectionsHeader.PerformLayout();
             trayMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
             ResumeLayout(false);
         }
 
@@ -579,5 +722,16 @@
         private ToolStripMenuItem miStop;
         private ToolStripMenuItem miRestart;
         private ToolStripMenuItem miExit;
+        private TabPage connectionsPage;
+        private TableLayoutPanel tableConnectionsHeader;
+        private Button btnRefreshConnections;
+        private Label lblLastUpdateCaption;
+        private DataGridView gridConnections;
+        private DataGridViewCheckBoxColumn colSelected;
+        private DataGridViewTextBoxColumn colTag;
+        private DataGridViewTextBoxColumn colType;
+        private DataGridViewTextBoxColumn colAddress;
+        private DataGridViewTextBoxColumn colStatus;
+        private Label lblLastUpdate;
     }
 }
