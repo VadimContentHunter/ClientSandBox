@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             tabMain = new TabControl();
             settingPage = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -59,9 +62,11 @@
             lblPidInf = new Label();
             labelPIDCaption = new Label();
             connectionsPage = new TabPage();
+            gridConnections = new DataGridView();
             tableConnectionsHeader = new TableLayoutPanel();
             btnRefreshConnections = new Button();
             lblLastUpdateCaption = new Label();
+            lblLastUpdate = new Label();
             logsPage = new TabPage();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
@@ -70,13 +75,11 @@
             miStop = new ToolStripMenuItem();
             miRestart = new ToolStripMenuItem();
             miExit = new ToolStripMenuItem();
-            gridConnections = new DataGridView();
             colSelected = new DataGridViewCheckBoxColumn();
             colTag = new DataGridViewTextBoxColumn();
             colType = new DataGridViewTextBoxColumn();
             colAddress = new DataGridViewTextBoxColumn();
             colStatus = new DataGridViewTextBoxColumn();
-            lblLastUpdate = new Label();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -88,9 +91,9 @@
             flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
             connectionsPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
             tableConnectionsHeader.SuspendLayout();
             trayMenu.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
             SuspendLayout();
             // 
             // tabMain
@@ -475,6 +478,51 @@
             connectionsPage.Text = "Подключения";
             connectionsPage.UseVisualStyleBackColor = true;
             // 
+            // gridConnections
+            // 
+            gridConnections.AllowUserToAddRows = false;
+            gridConnections.AllowUserToDeleteRows = false;
+            gridConnections.AllowUserToResizeRows = false;
+            gridConnections.BackgroundColor = SystemColors.Window;
+            gridConnections.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Window;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Window;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            gridConnections.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            gridConnections.Columns.AddRange(new DataGridViewColumn[] { colSelected, colTag, colType, colAddress, colStatus });
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Window;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle2.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.GradientInactiveCaption;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            gridConnections.DefaultCellStyle = dataGridViewCellStyle2;
+            gridConnections.Dock = DockStyle.Fill;
+            gridConnections.EnableHeadersVisualStyles = false;
+            gridConnections.Location = new Point(3, 69);
+            gridConnections.MultiSelect = false;
+            gridConnections.Name = "gridConnections";
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Window;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            gridConnections.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            gridConnections.RowHeadersVisible = false;
+            gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            gridConnections.Size = new Size(870, 461);
+            gridConnections.TabIndex = 1;
+            gridConnections.CellContentClick += gridConnections_CellContentClick;
+            gridConnections.CellDoubleClick += gridConnections_CellDoubleClick;
+            // 
             // tableConnectionsHeader
             // 
             tableConnectionsHeader.AutoSize = true;
@@ -504,6 +552,7 @@
             btnRefreshConnections.TabIndex = 1;
             btnRefreshConnections.Text = "Обновить";
             btnRefreshConnections.UseVisualStyleBackColor = true;
+            btnRefreshConnections.Click += btnRefreshConnections_Click;
             // 
             // lblLastUpdateCaption
             // 
@@ -514,6 +563,16 @@
             lblLastUpdateCaption.Size = new Size(143, 15);
             lblLastUpdateCaption.TabIndex = 0;
             lblLastUpdateCaption.Text = "Последнее обновление: ";
+            // 
+            // lblLastUpdate
+            // 
+            lblLastUpdate.Anchor = AnchorStyles.Left;
+            lblLastUpdate.AutoSize = true;
+            lblLastUpdate.Location = new Point(152, 28);
+            lblLastUpdate.Name = "lblLastUpdate";
+            lblLastUpdate.Size = new Size(19, 15);
+            lblLastUpdate.TabIndex = 2;
+            lblLastUpdate.Text = "—";
             // 
             // logsPage
             // 
@@ -573,24 +632,6 @@
             miExit.Text = "Выход";
             miExit.Click += miExit_Click;
             // 
-            // gridConnections
-            // 
-            gridConnections.AllowUserToAddRows = false;
-            gridConnections.AllowUserToDeleteRows = false;
-            gridConnections.AllowUserToResizeRows = false;
-            gridConnections.BackgroundColor = SystemColors.Window;
-            gridConnections.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
-            gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            gridConnections.Columns.AddRange(new DataGridViewColumn[] { colSelected, colTag, colType, colAddress, colStatus });
-            gridConnections.Dock = DockStyle.Fill;
-            gridConnections.Location = new Point(3, 69);
-            gridConnections.MultiSelect = false;
-            gridConnections.Name = "gridConnections";
-            gridConnections.RowHeadersVisible = false;
-            gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            gridConnections.Size = new Size(870, 461);
-            gridConnections.TabIndex = 1;
-            // 
             // colSelected
             // 
             colSelected.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
@@ -620,29 +661,20 @@
             // 
             // colAddress
             // 
-            colAddress.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            colAddress.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             colAddress.HeaderText = "Адрес подключения";
+            colAddress.MinimumWidth = 200;
             colAddress.Name = "colAddress";
             colAddress.ReadOnly = true;
+            colAddress.Width = 250;
             // 
             // colStatus
             // 
-            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             colStatus.HeaderText = "Состояние";
             colStatus.MinimumWidth = 180;
             colStatus.Name = "colStatus";
             colStatus.ReadOnly = true;
-            colStatus.Width = 200;
-            // 
-            // lblLastUpdate
-            // 
-            lblLastUpdate.Anchor = AnchorStyles.Left;
-            lblLastUpdate.AutoSize = true;
-            lblLastUpdate.Location = new Point(152, 28);
-            lblLastUpdate.Name = "lblLastUpdate";
-            lblLastUpdate.Size = new Size(19, 15);
-            lblLastUpdate.TabIndex = 2;
-            lblLastUpdate.Text = "—";
             // 
             // MainForm
             // 
@@ -676,10 +708,10 @@
             tableStatusControl.PerformLayout();
             connectionsPage.ResumeLayout(false);
             connectionsPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
             tableConnectionsHeader.ResumeLayout(false);
             tableConnectionsHeader.PerformLayout();
             trayMenu.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
             ResumeLayout(false);
         }
 
@@ -727,11 +759,11 @@
         private Button btnRefreshConnections;
         private Label lblLastUpdateCaption;
         private DataGridView gridConnections;
+        private Label lblLastUpdate;
         private DataGridViewCheckBoxColumn colSelected;
         private DataGridViewTextBoxColumn colTag;
         private DataGridViewTextBoxColumn colType;
         private DataGridViewTextBoxColumn colAddress;
         private DataGridViewTextBoxColumn colStatus;
-        private Label lblLastUpdate;
     }
 }

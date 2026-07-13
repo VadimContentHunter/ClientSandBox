@@ -1,5 +1,6 @@
 ﻿using ClientSandBox.Models;
 using ClientSandBox.Services;
+using ClientSandBox.Services.Inbound;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -11,6 +12,7 @@ public partial class MainForm : Form
     private bool? _lastRunningState;
     private int? _lastPid;
     private bool _allowClose;
+    private const string SelectedColumnName = "colSelected";
 
     public MainForm()
     {
@@ -28,6 +30,99 @@ public partial class MainForm : Form
 
         RefreshUI();
     }
+
+    #region Connections
+    /// <summary>
+    /// Обновляет список подключений.
+    /// </summary>
+    private void RefreshConnections()
+    {
+        if (!File.Exists(SettingsService.Current.ConfigPath))
+        {
+            gridConnections.Rows.Clear();
+            gridConnections.Enabled = false;
+            lblLastUpdate.Text = "—";
+
+            return;
+        }
+
+        IReadOnlyList<InboundInfo> inbounds =
+            InboundService.Load(SettingsService.Current.ConfigPath);
+
+        FillConnectionsGrid(inbounds);
+        UpdateLastRefreshTime();
+        gridConnections.Enabled = inbounds.Count > 0;
+    }
+
+    /// <summary>
+    /// Заполняет таблицу подключений.
+    /// </summary>
+    /// <param name="inbounds">Список Inbound.</param>
+    private void FillConnectionsGrid(IReadOnlyList<InboundInfo> inbounds)
+    {
+        gridConnections.Rows.Clear();
+
+        foreach (InboundInfo inbound in inbounds)
+        {
+            int rowIndex = gridConnections.Rows.Add(
+                inbound.IsSelected,
+                inbound.GetString("tag") ?? "—",
+                inbound.GetString("type") ?? "—",
+                BuildConnectionAddress(inbound),
+                inbound.Status
+            );
+
+            DataGridViewRow row = gridConnections.Rows[rowIndex];
+            row.Tag = inbound;
+        }
+
+        gridConnections.ClearSelection();
+    }
+
+    /// <summary>
+    /// Делает выбранным только один Inbound.
+    /// </summary>
+    /// <param name="selectedRow">Выбранная строка.</param>
+    private void SelectInbound(DataGridViewRow selectedRow)
+    {
+        foreach (DataGridViewRow row in gridConnections.Rows)
+        {
+            bool isSelected = row == selectedRow;
+
+            row.Cells[SelectedColumnName].Value = isSelected;
+            if (row.Tag is InboundInfo inbound)
+            {
+                inbound.IsSelected = isSelected;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Формирует отображаемый адрес подключения.
+    /// </summary>
+    /// <param name="inbound">Inbound.</param>
+    /// <returns>Адрес подключения или "—".</returns>
+    private static string BuildConnectionAddress(InboundInfo inbound)
+    {
+        string? listen = inbound.GetString("listen");
+        int? port = inbound.GetInt("listen_port");
+
+        if (string.IsNullOrWhiteSpace(listen) || port is null)
+        {
+            return "—";
+        }
+
+        return $"{listen}:{port}";
+    }
+
+    /// <summary>
+    /// Обновляет время последнего обновления.
+    /// </summary>
+    private void UpdateLastRefreshTime()
+    {
+        lblLastUpdate.Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+    }
+    #endregion
 
     private void LoadSettings()
     {
@@ -83,16 +178,6 @@ public partial class MainForm : Form
         base.OnFormClosing(e);
     }
 
-    private void RefreshUI()
-    {
-        ValidateSingBoxPath();
-        ValidateConfigPath();
-
-        UpdateVersion();
-        UpdateStatus();
-        UpdateButtons();
-    }
-
     private void ValidateSingBoxPath()
     {
         bool exists = File.Exists(txtSingBox.Text);
@@ -109,6 +194,18 @@ public partial class MainForm : Form
         txtConfig.BackColor = exists
             ? SystemColors.Window
             : Color.MistyRose;
+    }
+
+    private void RefreshUI()
+    {
+        ValidateSingBoxPath();
+        ValidateConfigPath();
+
+        UpdateVersion();
+        UpdateStatus();
+        UpdateButtons();
+
+        RefreshConnections();
     }
 
     private void UpdateVersion()
@@ -355,5 +452,35 @@ public partial class MainForm : Form
         miStart.Enabled = btnStartSingBox.Enabled;
         miStop.Enabled = btnStopSingBox.Enabled;
         miRestart.Enabled = btnRestartSingBox.Enabled;
+    }
+
+    private void btnRefreshConnections_Click(object sender, EventArgs e)
+    {
+        RefreshConnections();
+    }
+
+    private void gridConnections_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0)
+        {
+            return;
+        }
+
+        if (gridConnections.Columns[e.ColumnIndex].Name != SelectedColumnName)
+        {
+            return;
+        }
+
+        SelectInbound(gridConnections.Rows[e.RowIndex]);
+    }
+
+    private void gridConnections_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0)
+        {
+            return;
+        }
+
+        SelectInbound(gridConnections.Rows[e.RowIndex]);
     }
 }
