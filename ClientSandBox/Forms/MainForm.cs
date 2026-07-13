@@ -74,9 +74,22 @@ public partial class MainForm : Form
 
             DataGridViewRow row = gridConnections.Rows[rowIndex];
             row.Tag = inbound;
+
+            row.Cells[SelectedColumnName].ReadOnly =
+                !CanSelectInbound(inbound);
+
+            ApplyStatusStyle(row, inbound);
         }
 
         gridConnections.ClearSelection();
+    }
+
+    /// <summary>
+    /// Определяет, доступен ли Inbound для выбора.
+    /// </summary>
+    private static bool CanSelectInbound(InboundInfo inbound)
+    {
+        return inbound.Status == InboundStatuses.Ready;
     }
 
     /// <summary>
@@ -85,16 +98,56 @@ public partial class MainForm : Form
     /// <param name="selectedRow">Выбранная строка.</param>
     private void SelectInbound(DataGridViewRow selectedRow)
     {
+        if (selectedRow.Tag is not InboundInfo inbound)
+        {
+            return;
+        }
+
+        if (!CanSelectInbound(inbound))
+        {
+            return;
+        }
+
         foreach (DataGridViewRow row in gridConnections.Rows)
         {
             bool isSelected = row == selectedRow;
 
             row.Cells[SelectedColumnName].Value = isSelected;
-            if (row.Tag is InboundInfo inbound)
+            if (row.Tag is InboundInfo currentInbound)
             {
-                inbound.IsSelected = isSelected;
+                currentInbound.IsSelected = isSelected;
             }
         }
+    }
+
+    private void ApplyStatusStyle(DataGridViewRow row, InboundInfo inbound)
+    {
+        DataGridViewCell cell = row.Cells["colStatus"];
+
+        switch (inbound.Status)
+        {
+            case InboundStatuses.Ready:
+                cell.Style.ForeColor = Color.Green;
+                break;
+
+            case InboundStatuses.PortInUse:
+                cell.Style.ForeColor = Color.Red;
+                break;
+
+            case InboundStatuses.InsufficientData:
+                cell.Style.ForeColor = Color.DarkOrange;
+                break;
+
+            case InboundStatuses.UnknownType:
+                cell.Style.ForeColor = Color.Gray;
+                break;
+
+            case InboundStatuses.AnalysisError:
+                cell.Style.ForeColor = Color.Red;
+                break;
+        }
+
+        cell.ToolTipText = inbound.Status;
     }
 
     /// <summary>
@@ -104,15 +157,42 @@ public partial class MainForm : Form
     /// <returns>Адрес подключения или "—".</returns>
     private static string BuildConnectionAddress(InboundInfo inbound)
     {
-        string? listen = inbound.GetString("listen");
-        int? port = inbound.GetInt("listen_port");
+        string? type = inbound.GetString("type");
 
-        if (string.IsNullOrWhiteSpace(listen) || port is null)
+        switch (type)
         {
-            return "—";
-        }
+            case "mixed":
+            case "http":
+            case "socks":
+                {
+                    string? listen = inbound.GetString("listen");
+                    int? port = inbound.GetInt("listen_port");
 
-        return $"{listen}:{port}";
+                    if (string.IsNullOrWhiteSpace(listen) || port is null)
+                    {
+                        return "—";
+                    }
+
+                    return $"{listen}:{port}";
+                }
+
+            case "tun":
+                {
+                    string? interfaceName = inbound.GetString("interface_name");
+                    string? address = inbound.GetString("inet4_address");
+
+                    if (string.IsNullOrWhiteSpace(interfaceName) ||
+                        string.IsNullOrWhiteSpace(address))
+                    {
+                        return "—";
+                    }
+
+                    return $"{interfaceName} ({address})";
+                }
+
+            default:
+                return "—";
+        }
     }
 
     /// <summary>
