@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             tabMain = new TabControl();
             settingPage = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -58,6 +61,15 @@
             labelStatusSingBoxCaption = new Label();
             lblPidInf = new Label();
             labelPIDCaption = new Label();
+            tabPageConnections = new TabPage();
+            gridConnections = new DataGridView();
+            colEnabled = new DataGridViewCheckBoxColumn();
+            colTag = new DataGridViewTextBoxColumn();
+            colType = new DataGridViewTextBoxColumn();
+            colStatus = new DataGridViewTextBoxColumn();
+            colInfo = new DataGridViewTextBoxColumn();
+            fLConnectionsControlPanel = new FlowLayoutPanel();
+            btnAddConnection = new Button();
             logsPage = new TabPage();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
@@ -76,6 +88,9 @@
             groupSingBox.SuspendLayout();
             flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
+            tabPageConnections.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
+            fLConnectionsControlPanel.SuspendLayout();
             trayMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -83,6 +98,7 @@
             // 
             tabMain.Controls.Add(settingPage);
             tabMain.Controls.Add(controlPage);
+            tabMain.Controls.Add(tabPageConnections);
             tabMain.Controls.Add(logsPage);
             tabMain.Dock = DockStyle.Fill;
             tabMain.Location = new Point(0, 0);
@@ -447,6 +463,108 @@
             labelPIDCaption.Text = "PID:";
             labelPIDCaption.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // tabPageConnections
+            // 
+            tabPageConnections.Controls.Add(gridConnections);
+            tabPageConnections.Controls.Add(fLConnectionsControlPanel);
+            tabPageConnections.Location = new Point(4, 24);
+            tabPageConnections.Name = "tabPageConnections";
+            tabPageConnections.Padding = new Padding(3);
+            tabPageConnections.Size = new Size(876, 533);
+            tabPageConnections.TabIndex = 3;
+            tabPageConnections.Text = "Подключения";
+            tabPageConnections.UseVisualStyleBackColor = true;
+            // 
+            // gridConnections
+            // 
+            gridConnections.AllowUserToAddRows = false;
+            gridConnections.AllowUserToDeleteRows = false;
+            gridConnections.AllowUserToResizeColumns = false;
+            gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            gridConnections.Columns.AddRange(new DataGridViewColumn[] { colEnabled, colTag, colType, colStatus, colInfo });
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Window;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = Color.SteelBlue;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            gridConnections.DefaultCellStyle = dataGridViewCellStyle3;
+            gridConnections.Dock = DockStyle.Fill;
+            gridConnections.Location = new Point(3, 50);
+            gridConnections.MultiSelect = false;
+            gridConnections.Name = "gridConnections";
+            gridConnections.ReadOnly = true;
+            gridConnections.RowHeadersVisible = false;
+            gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            gridConnections.Size = new Size(870, 480);
+            gridConnections.TabIndex = 1;
+            // 
+            // colEnabled
+            // 
+            colEnabled.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colEnabled.HeaderText = "☑";
+            colEnabled.Name = "colEnabled";
+            colEnabled.ReadOnly = true;
+            colEnabled.Width = 40;
+            // 
+            // colTag
+            // 
+            colTag.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colTag.HeaderText = "Tag";
+            colTag.Name = "colTag";
+            colTag.ReadOnly = true;
+            colTag.Width = 180;
+            // 
+            // colType
+            // 
+            colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colType.DefaultCellStyle = dataGridViewCellStyle1;
+            colType.HeaderText = "Type";
+            colType.Name = "colType";
+            colType.ReadOnly = true;
+            colType.Width = 90;
+            // 
+            // colStatus
+            // 
+            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colStatus.DefaultCellStyle = dataGridViewCellStyle2;
+            colStatus.HeaderText = "Status";
+            colStatus.Name = "colStatus";
+            colStatus.ReadOnly = true;
+            colStatus.Width = 150;
+            // 
+            // colInfo
+            // 
+            colInfo.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            colInfo.HeaderText = "Info";
+            colInfo.Name = "colInfo";
+            colInfo.ReadOnly = true;
+            // 
+            // fLConnectionsControlPanel
+            // 
+            fLConnectionsControlPanel.AutoSize = true;
+            fLConnectionsControlPanel.Controls.Add(btnAddConnection);
+            fLConnectionsControlPanel.Dock = DockStyle.Top;
+            fLConnectionsControlPanel.Location = new Point(3, 3);
+            fLConnectionsControlPanel.Name = "fLConnectionsControlPanel";
+            fLConnectionsControlPanel.Padding = new Padding(0, 8, 0, 8);
+            fLConnectionsControlPanel.Size = new Size(870, 47);
+            fLConnectionsControlPanel.TabIndex = 0;
+            // 
+            // btnAddConnection
+            // 
+            btnAddConnection.AutoSize = true;
+            btnAddConnection.Location = new Point(3, 11);
+            btnAddConnection.Name = "btnAddConnection";
+            btnAddConnection.Size = new Size(148, 25);
+            btnAddConnection.TabIndex = 0;
+            btnAddConnection.Text = "Добавить подключение";
+            btnAddConnection.UseVisualStyleBackColor = true;
+            btnAddConnection.Click += btnAddConnection_Click;
+            // 
             // logsPage
             // 
             logsPage.Location = new Point(4, 24);
@@ -535,6 +653,11 @@
             flowLayoutSingBox.PerformLayout();
             tableStatusControl.ResumeLayout(false);
             tableStatusControl.PerformLayout();
+            tabPageConnections.ResumeLayout(false);
+            tabPageConnections.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
+            fLConnectionsControlPanel.ResumeLayout(false);
+            fLConnectionsControlPanel.PerformLayout();
             trayMenu.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -578,5 +701,14 @@
         private ToolStripMenuItem miStop;
         private ToolStripMenuItem miRestart;
         private ToolStripMenuItem miExit;
+        private TabPage tabPageConnections;
+        private FlowLayoutPanel fLConnectionsControlPanel;
+        private Button btnAddConnection;
+        private DataGridView gridConnections;
+        private DataGridViewCheckBoxColumn colEnabled;
+        private DataGridViewTextBoxColumn colTag;
+        private DataGridViewTextBoxColumn colType;
+        private DataGridViewTextBoxColumn colStatus;
+        private DataGridViewTextBoxColumn colInfo;
     }
 }

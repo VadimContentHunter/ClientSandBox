@@ -81,6 +81,7 @@
             btnSave.TabIndex = 0;
             btnSave.Text = "Сохранить";
             btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += BtnSave_Click;
             // 
             // btnCancel
             // 
@@ -90,6 +91,7 @@
             btnCancel.TabIndex = 1;
             btnCancel.Text = "Отмена";
             btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += BtnCancel_Click;
             // 
             // ConnectionEditForm
             // 

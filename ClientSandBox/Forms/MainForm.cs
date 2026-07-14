@@ -1,4 +1,6 @@
-﻿using ClientSandBox.Services;
+﻿using ClientSandBox.Models;
+using ClientSandBox.Services;
+using ClientSandBox.Services.Connections;
 using ClientSandBox.Services.SingBox;
 using System.Diagnostics;
 
@@ -7,15 +9,26 @@ namespace ClientSandBox.Forms;
 public partial class MainForm : Form
 {
     private readonly System.Windows.Forms.Timer _statusTimer = new();
+
     private bool? _lastRunningState;
+
     private int? _lastPid;
+
     private bool _allowClose;
+
+    private readonly ConnectionStorage _connectionStorage = new();
+
+    private readonly ConnectionManager _connectionManager;
 
     public MainForm()
     {
         InitializeComponent();
-        LoadSettings();
 
+        _connectionManager = new ConnectionManager(_connectionStorage);
+        _connectionStorage.Load();
+        RefreshConnections();
+
+        LoadSettings();
         notifyIcon.Icon = Icon;
         _statusTimer.Interval = 2000;
         _statusTimer.Tick += StatusTimer_Tick;
@@ -187,6 +200,22 @@ public partial class MainForm : Form
         if (!ExecuteCommand(SingBoxRunner.Restart, false))
         {
             return;
+        }
+    }
+
+    private void RefreshConnections()
+    {
+        gridConnections.Rows.Clear();
+
+        foreach (ConnectionInfo connection in _connectionManager.GetConnections())
+        {
+            gridConnections.Rows.Add(
+                connection.IsEnabled,
+                connection.Tag,
+                connection.Type,
+                connection.Status,
+                connection.Json
+            );
         }
     }
 
@@ -376,5 +405,31 @@ public partial class MainForm : Form
         miStart.Enabled = btnStartSingBox.Enabled;
         miStop.Enabled = btnStopSingBox.Enabled;
         miRestart.Enabled = btnRestartSingBox.Enabled;
+    }
+
+    private void btnAddConnection_Click(object? sender, EventArgs e)
+    {
+        using ConnectionEditForm form = new();
+
+        if (form.ShowDialog() != DialogResult.OK)
+        {
+            return;
+        }
+
+        ConnectionValidationResult result =
+            _connectionManager.Add(form.ConnectionJson);
+
+        if (!result.Success)
+        {
+            MessageBox.Show(
+                result.Message,
+                "Ошибка",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
+            return;
+        }
+
+        RefreshConnections();
     }
 }
