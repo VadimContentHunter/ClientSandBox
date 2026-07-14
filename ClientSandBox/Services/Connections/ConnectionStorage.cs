@@ -8,6 +8,15 @@ namespace ClientSandBox.Services.Connections;
 /// </summary>
 public sealed class ConnectionStorage
 {
+    private const string FileName = "connections.json";
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true
+    };
+
+    private string FilePath => Path.Combine(AppContext.BaseDirectory, FileName);
+
     /// <summary>
     /// Список подключений.
     /// </summary>
@@ -23,7 +32,27 @@ public sealed class ConnectionStorage
     /// </summary>
     public void Load()
     {
+        _connections.Clear();
 
+        if (!File.Exists(FilePath))
+        {
+            Save();
+            return;
+        }
+
+        string json = File.ReadAllText(FilePath);
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return;
+        }
+
+        List<ConnectionInfo>? connections = JsonSerializer.Deserialize<List<ConnectionInfo>>(json);
+        if (connections is null)
+        {
+            return;
+        }
+
+        _connections.AddRange(connections);
     }
 
     /// <summary>
@@ -31,7 +60,8 @@ public sealed class ConnectionStorage
     /// </summary>
     public void Save()
     {
-
+        string json = JsonSerializer.Serialize(_connections, JsonOptions);
+        File.WriteAllText(FilePath, json);
     }
 
     /// <summary>
