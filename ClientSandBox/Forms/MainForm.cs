@@ -1,9 +1,6 @@
-﻿using ClientSandBox.Models;
-using ClientSandBox.Services;
-using ClientSandBox.Services.Inbound;
+﻿using ClientSandBox.Services;
 using ClientSandBox.Services.SingBox;
 using System.Diagnostics;
-using System.Drawing;
 
 namespace ClientSandBox.Forms;
 
@@ -13,7 +10,6 @@ public partial class MainForm : Form
     private bool? _lastRunningState;
     private int? _lastPid;
     private bool _allowClose;
-    private const string SelectedColumnName = "colSelected";
 
     public MainForm()
     {
@@ -31,171 +27,6 @@ public partial class MainForm : Form
 
         RefreshUI();
     }
-
-    #region Connections
-    /// <summary>
-    /// Обновляет список подключений.
-    /// </summary>
-    private void RefreshConnections()
-    {
-        if (!File.Exists(SettingsService.Current.ConfigPath))
-        {
-            gridConnections.Rows.Clear();
-            gridConnections.Enabled = false;
-            lblLastUpdate.Text = "—";
-
-            return;
-        }
-
-        IReadOnlyList<InboundInfo> inbounds =
-            InboundService.Load(SettingsService.Current.ConfigPath);
-
-        FillConnectionsGrid(inbounds);
-        UpdateLastRefreshTime();
-        gridConnections.Enabled = inbounds.Count > 0;
-    }
-
-    /// <summary>
-    /// Заполняет таблицу подключений.
-    /// </summary>
-    /// <param name="inbounds">Список Inbound.</param>
-    private void FillConnectionsGrid(IReadOnlyList<InboundInfo> inbounds)
-    {
-        gridConnections.Rows.Clear();
-
-        foreach (InboundInfo inbound in inbounds)
-        {
-            int rowIndex = gridConnections.Rows.Add(
-                inbound.IsSelected,
-                inbound.GetString("tag") ?? "—",
-                inbound.GetString("type") ?? "—",
-                BuildConnectionAddress(inbound),
-                inbound.Status
-            );
-
-            DataGridViewRow row = gridConnections.Rows[rowIndex];
-            row.Tag = inbound;
-
-            row.Cells[SelectedColumnName].ReadOnly =
-                !CanSelectInbound(inbound);
-
-            ApplyStatusStyle(row, inbound);
-        }
-
-        gridConnections.ClearSelection();
-    }
-
-    /// <summary>
-    /// Определяет, доступен ли Inbound для выбора.
-    /// </summary>
-    private static bool CanSelectInbound(InboundInfo inbound)
-    {
-        return inbound.Status == InboundStatuses.Ready;
-    }
-
-    /// <summary>
-    /// Делает выбранным только один Inbound.
-    /// </summary>
-    /// <param name="selectedRow">Выбранная строка.</param>
-    private void SelectInbound(DataGridViewRow selectedRow)
-    {
-        if (selectedRow.Tag is not InboundInfo inbound)
-        {
-            return;
-        }
-
-        if (!CanSelectInbound(inbound))
-        {
-            return;
-        }
-
-        InboundService.Select(inbound);
-        RefreshConnections();
-    }
-
-    private void ApplyStatusStyle(DataGridViewRow row, InboundInfo inbound)
-    {
-        DataGridViewCell cell = row.Cells["colStatus"];
-
-        switch (inbound.Status)
-        {
-            case InboundStatuses.Ready:
-                cell.Style.ForeColor = Color.Green;
-                break;
-
-            case InboundStatuses.PortInUse:
-                cell.Style.ForeColor = Color.Red;
-                break;
-
-            case InboundStatuses.InsufficientData:
-                cell.Style.ForeColor = Color.DarkOrange;
-                break;
-
-            case InboundStatuses.UnknownType:
-                cell.Style.ForeColor = Color.Gray;
-                break;
-
-            case InboundStatuses.AnalysisError:
-                cell.Style.ForeColor = Color.Red;
-                break;
-        }
-
-        cell.ToolTipText = inbound.Status;
-    }
-
-    /// <summary>
-    /// Формирует отображаемый адрес подключения.
-    /// </summary>
-    /// <param name="inbound">Inbound.</param>
-    /// <returns>Адрес подключения или "—".</returns>
-    private static string BuildConnectionAddress(InboundInfo inbound)
-    {
-        string? type = inbound.GetString("type");
-
-        switch (type)
-        {
-            case "mixed":
-            case "http":
-            case "socks":
-                {
-                    string? listen = inbound.GetString("listen");
-                    int? port = inbound.GetInt("listen_port");
-
-                    if (string.IsNullOrWhiteSpace(listen) || port is null)
-                    {
-                        return "—";
-                    }
-
-                    return $"{listen}:{port}";
-                }
-
-            case "tun":
-                {
-                    string? interfaceName = inbound.GetString("interface_name");
-                    string? address = inbound.GetString("inet4_address");
-
-                    if (string.IsNullOrWhiteSpace(interfaceName) ||
-                        string.IsNullOrWhiteSpace(address))
-                    {
-                        return "—";
-                    }
-
-                    return $"{interfaceName} ({address})";
-                }
-
-            default:
-                return "—";
-        }
-    }
-
-    /// <summary>
-    /// Обновляет время последнего обновления.
-    /// </summary>
-    private void UpdateLastRefreshTime()
-    {
-        lblLastUpdate.Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-    }
-    #endregion
 
     private void LoadSettings()
     {
@@ -230,7 +61,6 @@ public partial class MainForm : Form
         _lastPid = pid;
 
         UpdateStatus();
-        UpdateTraffic();
         UpdateButtons();
     }
 
@@ -277,10 +107,7 @@ public partial class MainForm : Form
 
         UpdateVersion();
         UpdateStatus();
-        UpdateTraffic();
         UpdateButtons();
-
-        RefreshConnections();
     }
 
     private void UpdateVersion()
@@ -315,44 +142,26 @@ public partial class MainForm : Form
         btnStartSingBox.Enabled = canStart;
         btnStopSingBox.Enabled = canStop;
         btnRestartSingBox.Enabled = canStop;
-        btnReconnectTraffic.Enabled = SingBoxRunner.IsRunning && InboundConnectionService.CanConnect;
-        btnDisconnectTraffic.Enabled = InboundConnectionService.IsConnected;
     }
 
     private void UpdateStatus()
     {
-        if (!SingBoxRunner.IsRunning && InboundConnectionService.IsConnected)
-        {
-            InboundConnectionService.Disconnect();
-        }
-
         if (SingBoxRunner.IsRunning)
         {
             lblStatusSingBox.Text = "🟢 Запущен";
             lblPidInf.Text = SingBoxRunner.ProcessId?.ToString();
             lblStatusSingBox.ForeColor = Color.Green;
-        }else{
+        }
+        else
+        {
             lblStatusSingBox.Text = "✖ Не запущен";
             lblStatusSingBox.ForeColor = Color.Red;
             lblPidInf.Text = "—";
         }
     }
 
-    private void UpdateTraffic()
-    {
-        bool connected = InboundConnectionService.IsConnected;
-
-        lblTrafficInfo.ForeColor = connected
-            ? Color.Green
-            : Color.Red;
-
-        lblTrafficInfo.Text = connected
-            ? $"🟢 {InboundConnectionService.GetConnectionInfo()}"
-            : $"✖ {InboundConnectionService.GetConnectionInfo()}";
-    }
-
     /// <summary>
-    /// Запускает sing-box и перенаправляет трафик.
+    /// Запускает sing-box.
     /// </summary>
     private void StartSingBox()
     {
@@ -360,57 +169,26 @@ public partial class MainForm : Form
         {
             return;
         }
-
-        ExecuteCommand(InboundConnectionService.Connect);
     }
 
     /// <summary>
-    /// Останавливает перенаправление трафика и sing-box.
+    /// Останавливает sing-box.
     /// </summary>
     private void StopSingBox()
     {
-        if (!ExecuteCommand(InboundConnectionService.Disconnect, false))
-        {
-            return;
-        }
-
         ExecuteCommand(SingBoxRunner.Stop);
     }
 
     /// <summary>
-    /// Перезапускает sing-box и повторно перенаправляет трафик.
+    /// Перезапускает sing-box.
     /// </summary>
     private void RestartSingBox()
     {
-        if (!ExecuteCommand(InboundConnectionService.Disconnect, false))
-        {
-            return;
-        }
-
         if (!ExecuteCommand(SingBoxRunner.Restart, false))
         {
             return;
         }
-
-        ExecuteCommand(InboundConnectionService.Connect);
     }
-
-    /// <summary>
-    /// Перенаправляет трафик через выбранный Inbound.
-    /// </summary>
-    private void ReconnectTraffic()
-    {
-        ExecuteCommand(InboundConnectionService.Reconnect);
-    }
-
-    /// <summary>
-    /// Отключает перенаправление трафика.
-    /// </summary>
-    private void DisconnectTraffic()
-    {
-        ExecuteCommand(InboundConnectionService.Disconnect);
-    }
-
 
     private static bool ShowError((bool Success, string Output) result)
     {
@@ -593,50 +371,10 @@ public partial class MainForm : Form
         Close();
     }
 
-    private void btnReconnectTraffic_Click(object? sender, EventArgs e)
-    {
-        ReconnectTraffic();
-    }
-
-    private void btnDisconnectTraffic_Click(object? sender, EventArgs e)
-    {
-        DisconnectTraffic();
-    }
-
     private void trayMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
     {
         miStart.Enabled = btnStartSingBox.Enabled;
         miStop.Enabled = btnStopSingBox.Enabled;
         miRestart.Enabled = btnRestartSingBox.Enabled;
-    }
-
-    private void btnRefreshConnections_Click(object sender, EventArgs e)
-    {
-        RefreshConnections();
-    }
-
-    private void gridConnections_CellContentClick(object? sender, DataGridViewCellEventArgs e)
-    {
-        if (e.RowIndex < 0)
-        {
-            return;
-        }
-
-        if (gridConnections.Columns[e.ColumnIndex].Name != SelectedColumnName)
-        {
-            return;
-        }
-
-        SelectInbound(gridConnections.Rows[e.RowIndex]);
-    }
-
-    private void gridConnections_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
-    {
-        if (e.RowIndex < 0)
-        {
-            return;
-        }
-
-        SelectInbound(gridConnections.Rows[e.RowIndex]);
     }
 }

@@ -44,37 +44,9 @@ public static class InboundService
             _currentInbounds = InboundReader.Read(document);
 
             Analyze(_currentInbounds);
-            RestoreSelection();
 
             return _currentInbounds;
         }
-    }
-
-    /// <summary>
-    /// Делает Inbound выбранным.
-    /// </summary>
-    /// <param name="inbound">Inbound.</param>
-    public static void Select(InboundInfo inbound)
-    {
-        foreach (InboundInfo current in _currentInbounds)
-        {
-            current.IsSelected = false;
-        }
-
-        inbound.IsSelected = true;
-
-        SettingsService.Current.SelectedInboundTag =
-            inbound.GetString("tag") ?? string.Empty;
-
-        SettingsService.Save();
-    }
-
-    /// <summary>
-    /// Возвращает выбранный Inbound.
-    /// </summary>
-    public static InboundInfo? GetSelected()
-    {
-        return _currentInbounds.FirstOrDefault(i => i.IsSelected);
     }
 
     /// <summary>
@@ -89,32 +61,5 @@ public static class InboundService
                 validator.Analyze(inbound);
             }
         }
-    }
-
-    /// <summary>
-    /// Восстанавливает выбранный Inbound из настроек.
-    /// </summary>
-    private static void RestoreSelection()
-    {
-        string tag = SettingsService.Current.SelectedInboundTag;
-
-        if (string.IsNullOrWhiteSpace(tag))
-        {
-            return;
-        }
-
-        InboundInfo? selected =
-            _currentInbounds.FirstOrDefault(x =>
-                string.Equals(
-                    x.GetString("tag"),
-                    tag,
-                    StringComparison.OrdinalIgnoreCase));
-
-        if (selected is null)
-        {
-            return;
-        }
-
-        selected.IsSelected = true;
     }
 }

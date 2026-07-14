@@ -49,18 +49,12 @@
             btnCheckConfig = new Button();
             btnOpenFolder = new Button();
             btnOpenConfig = new Button();
-            groupBoxTraffic = new GroupBox();
-            flowLayoutPanel1 = new FlowLayoutPanel();
-            btnReconnectTraffic = new Button();
-            btnDisconnectTraffic = new Button();
             groupSingBox = new GroupBox();
             flowLayoutSingBox = new FlowLayoutPanel();
             btnStartSingBox = new Button();
             btnStopSingBox = new Button();
             btnRestartSingBox = new Button();
             tableStatusControl = new TableLayoutPanel();
-            lblTrafficInfo = new Label();
-            labelTrafficInfoCaption = new Label();
             lblStatusSingBox = new Label();
             lblVersionCaption = new Label();
             lblVersion = new Label();
@@ -74,10 +68,6 @@
             colType = new DataGridViewTextBoxColumn();
             colAddress = new DataGridViewTextBoxColumn();
             colStatus = new DataGridViewTextBoxColumn();
-            tableConnectionsHeader = new TableLayoutPanel();
-            btnRefreshConnections = new Button();
-            lblLastUpdateCaption = new Label();
-            lblLastUpdate = new Label();
             logsPage = new TabPage();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
@@ -93,14 +83,11 @@
             controlPage.SuspendLayout();
             groupGeneralControl.SuspendLayout();
             flowLayoutGeneralControl.SuspendLayout();
-            groupBoxTraffic.SuspendLayout();
-            flowLayoutPanel1.SuspendLayout();
             groupSingBox.SuspendLayout();
             flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
             connectionsPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
-            tableConnectionsHeader.SuspendLayout();
             trayMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -251,7 +238,6 @@
             // controlPage
             // 
             controlPage.Controls.Add(groupGeneralControl);
-            controlPage.Controls.Add(groupBoxTraffic);
             controlPage.Controls.Add(groupSingBox);
             controlPage.Controls.Add(tableStatusControl);
             controlPage.Location = new Point(4, 24);
@@ -267,7 +253,7 @@
             groupGeneralControl.AutoSize = true;
             groupGeneralControl.Controls.Add(flowLayoutGeneralControl);
             groupGeneralControl.Dock = DockStyle.Top;
-            groupGeneralControl.Location = new Point(3, 357);
+            groupGeneralControl.Location = new Point(3, 236);
             groupGeneralControl.Name = "groupGeneralControl";
             groupGeneralControl.Padding = new Padding(3, 8, 3, 20);
             groupGeneralControl.Size = new Size(870, 91);
@@ -324,59 +310,11 @@
             btnOpenConfig.UseVisualStyleBackColor = true;
             btnOpenConfig.Click += btnOpenConfig_Click;
             // 
-            // groupBoxTraffic
-            // 
-            groupBoxTraffic.Controls.Add(flowLayoutPanel1);
-            groupBoxTraffic.Dock = DockStyle.Top;
-            groupBoxTraffic.Location = new Point(3, 267);
-            groupBoxTraffic.Name = "groupBoxTraffic";
-            groupBoxTraffic.Padding = new Padding(3, 8, 3, 20);
-            groupBoxTraffic.Size = new Size(870, 90);
-            groupBoxTraffic.TabIndex = 2;
-            groupBoxTraffic.TabStop = false;
-            groupBoxTraffic.Text = "Управление трафиком";
-            // 
-            // flowLayoutPanel1
-            // 
-            flowLayoutPanel1.AutoSize = true;
-            flowLayoutPanel1.Controls.Add(btnReconnectTraffic);
-            flowLayoutPanel1.Controls.Add(btnDisconnectTraffic);
-            flowLayoutPanel1.Dock = DockStyle.Fill;
-            flowLayoutPanel1.Location = new Point(3, 24);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Padding = new Padding(0, 8, 0, 8);
-            flowLayoutPanel1.Size = new Size(864, 46);
-            flowLayoutPanel1.TabIndex = 0;
-            // 
-            // btnReconnectTraffic
-            // 
-            btnReconnectTraffic.AutoSize = true;
-            btnReconnectTraffic.Location = new Point(16, 11);
-            btnReconnectTraffic.Margin = new Padding(16, 3, 16, 3);
-            btnReconnectTraffic.Name = "btnReconnectTraffic";
-            btnReconnectTraffic.Size = new Size(145, 25);
-            btnReconnectTraffic.TabIndex = 3;
-            btnReconnectTraffic.Text = "Перенаправить трафик";
-            btnReconnectTraffic.UseVisualStyleBackColor = true;
-            btnReconnectTraffic.Click += btnReconnectTraffic_Click;
-            // 
-            // btnDisconnectTraffic
-            // 
-            btnDisconnectTraffic.AutoSize = true;
-            btnDisconnectTraffic.Location = new Point(193, 11);
-            btnDisconnectTraffic.Margin = new Padding(16, 3, 16, 3);
-            btnDisconnectTraffic.Name = "btnDisconnectTraffic";
-            btnDisconnectTraffic.Size = new Size(137, 25);
-            btnDisconnectTraffic.TabIndex = 4;
-            btnDisconnectTraffic.Text = "Отключить трафик";
-            btnDisconnectTraffic.UseVisualStyleBackColor = true;
-            btnDisconnectTraffic.Click += btnDisconnectTraffic_Click;
-            // 
             // groupSingBox
             // 
             groupSingBox.Controls.Add(flowLayoutSingBox);
             groupSingBox.Dock = DockStyle.Top;
-            groupSingBox.Location = new Point(3, 177);
+            groupSingBox.Location = new Point(3, 146);
             groupSingBox.Name = "groupSingBox";
             groupSingBox.Padding = new Padding(3, 8, 3, 20);
             groupSingBox.Size = new Size(870, 90);
@@ -439,8 +377,6 @@
             tableStatusControl.ColumnCount = 2;
             tableStatusControl.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
             tableStatusControl.ColumnStyles.Add(new ColumnStyle());
-            tableStatusControl.Controls.Add(lblTrafficInfo, 1, 1);
-            tableStatusControl.Controls.Add(labelTrafficInfoCaption, 0, 1);
             tableStatusControl.Controls.Add(lblStatusSingBox, 1, 0);
             tableStatusControl.Controls.Add(lblVersionCaption, 0, 3);
             tableStatusControl.Controls.Add(lblVersion, 1, 3);
@@ -456,29 +392,8 @@
             tableStatusControl.RowStyles.Add(new RowStyle());
             tableStatusControl.RowStyles.Add(new RowStyle());
             tableStatusControl.RowStyles.Add(new RowStyle());
-            tableStatusControl.Size = new Size(870, 174);
+            tableStatusControl.Size = new Size(870, 143);
             tableStatusControl.TabIndex = 0;
-            // 
-            // lblTrafficInfo
-            // 
-            lblTrafficInfo.Dock = DockStyle.Fill;
-            lblTrafficInfo.Location = new Point(143, 59);
-            lblTrafficInfo.Margin = new Padding(3, 8, 3, 8);
-            lblTrafficInfo.Name = "lblTrafficInfo";
-            lblTrafficInfo.Size = new Size(740, 15);
-            lblTrafficInfo.TabIndex = 7;
-            lblTrafficInfo.Text = "—";
-            lblTrafficInfo.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // labelTrafficInfoCaption
-            // 
-            labelTrafficInfoCaption.Location = new Point(3, 59);
-            labelTrafficInfoCaption.Margin = new Padding(3, 8, 3, 8);
-            labelTrafficInfoCaption.Name = "labelTrafficInfoCaption";
-            labelTrafficInfoCaption.Size = new Size(134, 15);
-            labelTrafficInfoCaption.TabIndex = 6;
-            labelTrafficInfoCaption.Text = "Направление трафика:";
-            labelTrafficInfoCaption.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblStatusSingBox
             // 
@@ -494,7 +409,7 @@
             // lblVersionCaption
             // 
             lblVersionCaption.Dock = DockStyle.Top;
-            lblVersionCaption.Location = new Point(3, 121);
+            lblVersionCaption.Location = new Point(3, 90);
             lblVersionCaption.Margin = new Padding(3, 8, 3, 8);
             lblVersionCaption.Name = "lblVersionCaption";
             lblVersionCaption.Size = new Size(134, 15);
@@ -506,7 +421,7 @@
             // 
             lblVersion.AutoSize = true;
             lblVersion.Dock = DockStyle.Fill;
-            lblVersion.Location = new Point(143, 121);
+            lblVersion.Location = new Point(143, 90);
             lblVersion.Margin = new Padding(3, 8, 3, 8);
             lblVersion.Name = "lblVersion";
             lblVersion.Size = new Size(740, 15);
@@ -527,7 +442,7 @@
             // lblPidInf
             // 
             lblPidInf.Dock = DockStyle.Fill;
-            lblPidInf.Location = new Point(143, 90);
+            lblPidInf.Location = new Point(143, 59);
             lblPidInf.Margin = new Padding(3, 8, 3, 8);
             lblPidInf.Name = "lblPidInf";
             lblPidInf.Size = new Size(740, 15);
@@ -537,7 +452,7 @@
             // 
             // labelPIDCaption
             // 
-            labelPIDCaption.Location = new Point(3, 90);
+            labelPIDCaption.Location = new Point(3, 59);
             labelPIDCaption.Margin = new Padding(3, 8, 3, 8);
             labelPIDCaption.Name = "labelPIDCaption";
             labelPIDCaption.Size = new Size(134, 15);
@@ -548,7 +463,6 @@
             // connectionsPage
             // 
             connectionsPage.Controls.Add(gridConnections);
-            connectionsPage.Controls.Add(tableConnectionsHeader);
             connectionsPage.Location = new Point(4, 24);
             connectionsPage.Name = "connectionsPage";
             connectionsPage.Padding = new Padding(3);
@@ -584,7 +498,7 @@
             gridConnections.DefaultCellStyle = dataGridViewCellStyle2;
             gridConnections.Dock = DockStyle.Fill;
             gridConnections.EnableHeadersVisualStyles = false;
-            gridConnections.Location = new Point(3, 69);
+            gridConnections.Location = new Point(3, 3);
             gridConnections.MultiSelect = false;
             gridConnections.Name = "gridConnections";
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -597,10 +511,8 @@
             gridConnections.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             gridConnections.RowHeadersVisible = false;
             gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            gridConnections.Size = new Size(870, 461);
+            gridConnections.Size = new Size(870, 527);
             gridConnections.TabIndex = 1;
-            gridConnections.CellContentClick += gridConnections_CellContentClick;
-            gridConnections.CellDoubleClick += gridConnections_CellDoubleClick;
             // 
             // colSelected
             // 
@@ -645,57 +557,6 @@
             colStatus.MinimumWidth = 180;
             colStatus.Name = "colStatus";
             colStatus.ReadOnly = true;
-            // 
-            // tableConnectionsHeader
-            // 
-            tableConnectionsHeader.AutoSize = true;
-            tableConnectionsHeader.ColumnCount = 3;
-            tableConnectionsHeader.ColumnStyles.Add(new ColumnStyle());
-            tableConnectionsHeader.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableConnectionsHeader.ColumnStyles.Add(new ColumnStyle());
-            tableConnectionsHeader.Controls.Add(btnRefreshConnections, 2, 0);
-            tableConnectionsHeader.Controls.Add(lblLastUpdateCaption, 0, 0);
-            tableConnectionsHeader.Controls.Add(lblLastUpdate, 1, 0);
-            tableConnectionsHeader.Dock = DockStyle.Top;
-            tableConnectionsHeader.Location = new Point(3, 3);
-            tableConnectionsHeader.Name = "tableConnectionsHeader";
-            tableConnectionsHeader.Padding = new Padding(0, 20, 0, 15);
-            tableConnectionsHeader.RowCount = 1;
-            tableConnectionsHeader.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableConnectionsHeader.Size = new Size(870, 66);
-            tableConnectionsHeader.TabIndex = 0;
-            // 
-            // btnRefreshConnections
-            // 
-            btnRefreshConnections.Anchor = AnchorStyles.Right;
-            btnRefreshConnections.AutoSize = true;
-            btnRefreshConnections.Location = new Point(792, 23);
-            btnRefreshConnections.Name = "btnRefreshConnections";
-            btnRefreshConnections.Size = new Size(75, 25);
-            btnRefreshConnections.TabIndex = 1;
-            btnRefreshConnections.Text = "Обновить";
-            btnRefreshConnections.UseVisualStyleBackColor = true;
-            btnRefreshConnections.Click += btnRefreshConnections_Click;
-            // 
-            // lblLastUpdateCaption
-            // 
-            lblLastUpdateCaption.Anchor = AnchorStyles.Left;
-            lblLastUpdateCaption.AutoSize = true;
-            lblLastUpdateCaption.Location = new Point(3, 28);
-            lblLastUpdateCaption.Name = "lblLastUpdateCaption";
-            lblLastUpdateCaption.Size = new Size(143, 15);
-            lblLastUpdateCaption.TabIndex = 0;
-            lblLastUpdateCaption.Text = "Последнее обновление: ";
-            // 
-            // lblLastUpdate
-            // 
-            lblLastUpdate.Anchor = AnchorStyles.Left;
-            lblLastUpdate.AutoSize = true;
-            lblLastUpdate.Location = new Point(152, 28);
-            lblLastUpdate.Name = "lblLastUpdate";
-            lblLastUpdate.Size = new Size(19, 15);
-            lblLastUpdate.TabIndex = 2;
-            lblLastUpdate.Text = "—";
             // 
             // logsPage
             // 
@@ -779,10 +640,6 @@
             groupGeneralControl.PerformLayout();
             flowLayoutGeneralControl.ResumeLayout(false);
             flowLayoutGeneralControl.PerformLayout();
-            groupBoxTraffic.ResumeLayout(false);
-            groupBoxTraffic.PerformLayout();
-            flowLayoutPanel1.ResumeLayout(false);
-            flowLayoutPanel1.PerformLayout();
             groupSingBox.ResumeLayout(false);
             groupSingBox.PerformLayout();
             flowLayoutSingBox.ResumeLayout(false);
@@ -790,10 +647,7 @@
             tableStatusControl.ResumeLayout(false);
             tableStatusControl.PerformLayout();
             connectionsPage.ResumeLayout(false);
-            connectionsPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
-            tableConnectionsHeader.ResumeLayout(false);
-            tableConnectionsHeader.PerformLayout();
             trayMenu.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -838,21 +692,11 @@
         private ToolStripMenuItem miRestart;
         private ToolStripMenuItem miExit;
         private TabPage connectionsPage;
-        private TableLayoutPanel tableConnectionsHeader;
-        private Button btnRefreshConnections;
-        private Label lblLastUpdateCaption;
         private DataGridView gridConnections;
-        private Label lblLastUpdate;
         private DataGridViewCheckBoxColumn colSelected;
         private DataGridViewTextBoxColumn colTag;
         private DataGridViewTextBoxColumn colType;
         private DataGridViewTextBoxColumn colAddress;
         private DataGridViewTextBoxColumn colStatus;
-        private Label lblTrafficInfo;
-        private Label labelTrafficInfoCaption;
-        private GroupBox groupBoxTraffic;
-        private FlowLayoutPanel flowLayoutPanel1;
-        private Button btnReconnectTraffic;
-        private Button btnDisconnectTraffic;
     }
 }
