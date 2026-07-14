@@ -1,4 +1,5 @@
 ﻿using ClientSandBox.Models;
+using ClientSandBox.Services.SystemProxy;
 
 namespace ClientSandBox.Services.Inbound.Connectors;
 
@@ -18,15 +19,19 @@ public sealed class SystemProxyConnector : IInboundConnector
 
     public (bool Success, string Output) Connect(InboundInfo inbound)
     {
-        _isConnected = true;
+        string? host = inbound.GetString("listen");
+        int? port = inbound.GetInt("listen_port");
 
-        return (true, "SystemProxyConnector пока не реализован.");
+        if (string.IsNullOrWhiteSpace(host) || port is null)
+        {
+            return (false, "Недостаточно данных.");
+        }
+
+        return SystemProxyService.Enable(host, port.Value);
     }
 
     public (bool Success, string Output) Disconnect()
     {
-        _isConnected = false;
-
-        return (true, string.Empty);
+        return SystemProxyService.Disable();
     }
 }
