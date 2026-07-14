@@ -1,5 +1,6 @@
 using ClientSandBox.Forms;
 using ClientSandBox.Services;
+using ClientSandBox.Services.AppLoggerService;
 using System.Text;
 using System.Threading;
 

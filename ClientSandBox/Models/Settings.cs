@@ -26,4 +26,6 @@ public class Settings
     /// Время запуска процесса (UTC).
     /// </summary>
     public DateTime? SingBoxStartTimeUtc { get; set; }
+
+    public string SelectedInboundTag { get; set; } = string.Empty;
 }

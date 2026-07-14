@@ -451,7 +451,7 @@ public partial class MainForm : Form
 
     private void btnCheckConfig_Click(object? sender, EventArgs e)
     {
-        ShowError(SingBoxService.CheckConfig());
+        ShowResult(SingBoxService.CheckConfig());
     }
 
     private void btnOpenSingBoxFolder_Click(object? sender, EventArgs e)

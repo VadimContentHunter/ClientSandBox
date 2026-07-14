@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace ClientSandBox.Services;
+namespace ClientSandBox.Services.AppLoggerService;
 
 public static class AppLogger
 {

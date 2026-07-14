@@ -63,6 +63,11 @@
             labelPIDCaption = new Label();
             connectionsPage = new TabPage();
             gridConnections = new DataGridView();
+            colSelected = new DataGridViewCheckBoxColumn();
+            colTag = new DataGridViewTextBoxColumn();
+            colType = new DataGridViewTextBoxColumn();
+            colAddress = new DataGridViewTextBoxColumn();
+            colStatus = new DataGridViewTextBoxColumn();
             tableConnectionsHeader = new TableLayoutPanel();
             btnRefreshConnections = new Button();
             lblLastUpdateCaption = new Label();
@@ -75,11 +80,6 @@
             miStop = new ToolStripMenuItem();
             miRestart = new ToolStripMenuItem();
             miExit = new ToolStripMenuItem();
-            colSelected = new DataGridViewCheckBoxColumn();
-            colTag = new DataGridViewTextBoxColumn();
-            colType = new DataGridViewTextBoxColumn();
-            colAddress = new DataGridViewTextBoxColumn();
-            colStatus = new DataGridViewTextBoxColumn();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -196,12 +196,12 @@
             // 
             // lblConfig
             // 
+            lblConfig.Anchor = AnchorStyles.Left;
             lblConfig.AutoSize = true;
-            lblConfig.Dock = DockStyle.Fill;
-            lblConfig.Location = new Point(3, 73);
+            lblConfig.Location = new Point(3, 77);
             lblConfig.Margin = new Padding(3, 10, 3, 10);
             lblConfig.Name = "lblConfig";
-            lblConfig.Size = new Size(111, 23);
+            lblConfig.Size = new Size(104, 15);
             lblConfig.TabIndex = 0;
             lblConfig.Text = "Путь к config.json";
             lblConfig.TextAlign = ContentAlignment.MiddleCenter;
@@ -230,12 +230,12 @@
             // 
             // lblSingBox
             // 
+            lblSingBox.Anchor = AnchorStyles.Left;
             lblSingBox.AutoSize = true;
-            lblSingBox.Dock = DockStyle.Fill;
-            lblSingBox.Location = new Point(3, 30);
+            lblSingBox.Location = new Point(3, 34);
             lblSingBox.Margin = new Padding(3, 10, 3, 10);
             lblSingBox.Name = "lblSingBox";
-            lblSingBox.Size = new Size(111, 23);
+            lblSingBox.Size = new Size(111, 15);
             lblSingBox.TabIndex = 0;
             lblSingBox.Text = "Путь к sing-box.exe";
             lblSingBox.TextAlign = ContentAlignment.MiddleCenter;
@@ -523,6 +523,50 @@
             gridConnections.CellContentClick += gridConnections_CellContentClick;
             gridConnections.CellDoubleClick += gridConnections_CellDoubleClick;
             // 
+            // colSelected
+            // 
+            colSelected.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colSelected.HeaderText = "☑";
+            colSelected.MinimumWidth = 55;
+            colSelected.Name = "colSelected";
+            colSelected.Resizable = DataGridViewTriState.False;
+            colSelected.Width = 55;
+            // 
+            // colTag
+            // 
+            colTag.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colTag.HeaderText = "Tag";
+            colTag.MinimumWidth = 120;
+            colTag.Name = "colTag";
+            colTag.ReadOnly = true;
+            colTag.Width = 150;
+            // 
+            // colType
+            // 
+            colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colType.HeaderText = "Тип";
+            colType.MinimumWidth = 90;
+            colType.Name = "colType";
+            colType.ReadOnly = true;
+            colType.Width = 90;
+            // 
+            // colAddress
+            // 
+            colAddress.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colAddress.HeaderText = "Адрес подключения";
+            colAddress.MinimumWidth = 200;
+            colAddress.Name = "colAddress";
+            colAddress.ReadOnly = true;
+            colAddress.Width = 250;
+            // 
+            // colStatus
+            // 
+            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            colStatus.HeaderText = "Состояние";
+            colStatus.MinimumWidth = 180;
+            colStatus.Name = "colStatus";
+            colStatus.ReadOnly = true;
+            // 
             // tableConnectionsHeader
             // 
             tableConnectionsHeader.AutoSize = true;
@@ -631,50 +675,6 @@
             miExit.Size = new Size(155, 22);
             miExit.Text = "Выход";
             miExit.Click += miExit_Click;
-            // 
-            // colSelected
-            // 
-            colSelected.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colSelected.HeaderText = "☑";
-            colSelected.MinimumWidth = 55;
-            colSelected.Name = "colSelected";
-            colSelected.Resizable = DataGridViewTriState.False;
-            colSelected.Width = 55;
-            // 
-            // colTag
-            // 
-            colTag.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colTag.HeaderText = "Tag";
-            colTag.MinimumWidth = 120;
-            colTag.Name = "colTag";
-            colTag.ReadOnly = true;
-            colTag.Width = 150;
-            // 
-            // colType
-            // 
-            colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colType.HeaderText = "Тип";
-            colType.MinimumWidth = 90;
-            colType.Name = "colType";
-            colType.ReadOnly = true;
-            colType.Width = 90;
-            // 
-            // colAddress
-            // 
-            colAddress.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colAddress.HeaderText = "Адрес подключения";
-            colAddress.MinimumWidth = 200;
-            colAddress.Name = "colAddress";
-            colAddress.ReadOnly = true;
-            colAddress.Width = 250;
-            // 
-            // colStatus
-            // 
-            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            colStatus.HeaderText = "Состояние";
-            colStatus.MinimumWidth = 180;
-            colStatus.Name = "colStatus";
-            colStatus.ReadOnly = true;
             // 
             // MainForm
             // 
