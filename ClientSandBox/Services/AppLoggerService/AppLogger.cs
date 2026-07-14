@@ -2,12 +2,18 @@
 
 namespace ClientSandBox.Services.AppLoggerService;
 
+/// <summary>
+/// Логгер приложения.
+/// </summary>
 public static class AppLogger
 {
     private static readonly object Locker = new();
 
-    private static string LogFilePath =>
-        Path.Combine(AppContext.BaseDirectory, "application.log");
+    public static string LogDirectory =>
+        AppContext.BaseDirectory;
+
+    public static string LogFilePath =>
+        Path.Combine(LogDirectory, "application.log");
 
     /// <summary>
     /// Инициализация логгера.
@@ -34,49 +40,36 @@ public static class AppLogger
     /// <summary>
     /// Записать информационное сообщение.
     /// </summary>
+    /// <param name="message">Сообщение.</param>
     public static void Info(string message)
     {
-        Write("INFO", message);
+        Write(LogLevel.Info, message);
     }
 
     /// <summary>
     /// Записать предупреждение.
     /// </summary>
+    /// <param name="message">Сообщение.</param>
     public static void Warning(string message)
     {
-        Write("WARNING", message);
+        Write(LogLevel.Warning, message);
     }
 
     /// <summary>
     /// Записать ошибку.
     /// </summary>
+    /// <param name="message">Сообщение.</param>
     public static void Error(string message)
     {
-        Write("ERROR", message);
+        Write(LogLevel.Error, message);
     }
 
     /// <summary>
-    /// Записать исключение.
+    /// Записать сообщение указанного уровня.
     /// </summary>
-    public static void Exception(Exception ex)
-    {
-        StringBuilder builder = new();
-
-        builder.AppendLine(ex.Message);
-        builder.AppendLine(ex.StackTrace);
-
-        if (ex.InnerException != null)
-        {
-            builder.AppendLine();
-            builder.AppendLine("Внутреннее исключение:");
-            builder.AppendLine(ex.InnerException.Message);
-            builder.AppendLine(ex.InnerException.StackTrace);
-        }
-
-        Write("EXCEPTION", builder.ToString());
-    }
-
-    private static void Write(string level, string message)
+    /// <param name="level">Уровень сообщения.</param>
+    /// <param name="message">Сообщение.</param>
+    public static void Write(LogLevel level, string message)
     {
         try
         {
@@ -93,5 +86,27 @@ public static class AppLogger
             // Игнорируем ошибки логирования,
             // чтобы приложение не падало.
         }
+    }
+
+    /// <summary>
+    /// Записать исключение.
+    /// </summary>
+    /// <param name="exception">Исключение.</param>
+    public static void Exception(Exception exception)
+    {
+        StringBuilder builder = new();
+
+        builder.AppendLine(exception.Message);
+        builder.AppendLine(exception.StackTrace ?? string.Empty);
+
+        if (exception.InnerException != null)
+        {
+            builder.AppendLine();
+            builder.AppendLine("Внутреннее исключение:");
+            builder.AppendLine(exception.InnerException.Message);
+            builder.AppendLine(exception.InnerException.StackTrace ?? string.Empty);
+        }
+
+        Error(builder.ToString());
     }
 }
