@@ -6,47 +6,40 @@ namespace ClientSandBox.Services.SingBox;
 /// <summary>
 /// Выполняет сбор вывода процесса sing-box во время запуска.
 /// </summary>
-public sealed class SingBoxStartupMonitor
+public sealed class SingBoxStartupMonitor : IDisposable
 {
-    private readonly StringBuilder _output = new();
-    private readonly StringBuilder _error = new();
-
+    private readonly StringBuilder _standardOutput = new();
+    private readonly StringBuilder _standardError = new();
     private readonly object _locker = new();
 
-    /// <summary>
-    /// Стандартный вывод процесса.
-    /// </summary>
+    private Process? _process;
+
     public string StandardOutput
     {
         get
         {
             lock (_locker)
             {
-                return _output.ToString();
+                return _standardOutput.ToString();
             }
         }
     }
 
-    /// <summary>
-    /// Вывод ошибок процесса.
-    /// </summary>
     public string StandardError
     {
         get
         {
             lock (_locker)
             {
-                return _error.ToString();
+                return _standardError.ToString();
             }
         }
     }
 
-    /// <summary>
-    /// Начинает отслеживание процесса.
-    /// </summary>
-    /// <param name="process">Процесс sing-box.</param>
     public void Start(Process process)
     {
+        _process = process;
+
         process.OutputDataReceived += Process_OutputDataReceived;
         process.ErrorDataReceived += Process_ErrorDataReceived;
 
@@ -54,39 +47,38 @@ public sealed class SingBoxStartupMonitor
         process.BeginErrorReadLine();
     }
 
-    /// <summary>
-    /// Обрабатывает стандартный вывод процесса.
-    /// </summary>
-    private void Process_OutputDataReceived(
-        object? sender,
-        DataReceivedEventArgs arguments)
+    public void Dispose()
     {
-        if (string.IsNullOrWhiteSpace(arguments.Data))
+        if (_process is null)
         {
             return;
         }
 
+        _process.OutputDataReceived -= Process_OutputDataReceived;
+        _process.ErrorDataReceived -= Process_ErrorDataReceived;
+
+        _process = null;
+    }
+
+    private void Process_OutputDataReceived(object? sender, DataReceivedEventArgs arguments)
+    {
+        if (string.IsNullOrWhiteSpace(arguments.Data))
+            return;
+
         lock (_locker)
         {
-            _output.AppendLine(arguments.Data);
+            _standardOutput.AppendLine(arguments.Data);
         }
     }
 
-    /// <summary>
-    /// Обрабатывает вывод ошибок процесса.
-    /// </summary>
-    private void Process_ErrorDataReceived(
-        object? sender,
-        DataReceivedEventArgs arguments)
+    private void Process_ErrorDataReceived(object? sender, DataReceivedEventArgs arguments)
     {
         if (string.IsNullOrWhiteSpace(arguments.Data))
-        {
             return;
-        }
 
         lock (_locker)
         {
-            _error.AppendLine(arguments.Data);
+            _standardError.AppendLine(arguments.Data);
         }
     }
 }

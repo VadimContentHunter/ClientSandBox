@@ -388,7 +388,7 @@ public partial class MainForm : Form
 
     private void ExecuteCommand(Func<(bool Success, string Output)> command)
     {
-        ShowResult(command());
+        ShowError(command());
 
         RefreshUI();
     }

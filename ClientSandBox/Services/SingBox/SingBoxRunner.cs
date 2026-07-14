@@ -1,5 +1,6 @@
 ﻿using ClientSandBox.Services.AppLoggerService;
 using System.Diagnostics;
+using System.Text;
 
 namespace ClientSandBox.Services.SingBox;
 
@@ -17,6 +18,8 @@ public static class SingBoxRunner
     /// Идентификатор процесса.
     /// </summary>
     public static int? ProcessId => GetProcess()?.Id;
+
+    private const int StartupTimeout = 500;
 
     private static Process? GetProcess()
     {
@@ -76,8 +79,15 @@ public static class SingBoxRunner
                 FileName = SettingsService.Current.SingBoxPath,
                 Arguments = $"run -c \"{SettingsService.Current.ConfigPath}\"",
                 WorkingDirectory = workingDirectory,
+
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
             };
 
             Process? process = Process.Start(info);
@@ -85,17 +95,43 @@ public static class SingBoxRunner
             if (process is null)
                 return (false, "Не удалось запустить sing-box.");
 
+            using SingBoxStartupMonitor monitor = new();
+
+            monitor.Start(process);
+
+            if (process.WaitForExit(StartupTimeout))
+            {
+                string output = monitor.StandardError;
+
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    output = monitor.StandardOutput;
+                }
+
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    output = "Sing-box завершился сразу после запуска.";
+                }
+
+                AppLogger.Error(output);
+
+                process.Dispose();
+
+                return (false, output.Trim());
+            }
+
             SettingsService.Current.SingBoxProcessId = process.Id;
             SettingsService.Current.SingBoxStartTimeUtc = process.StartTime.ToUniversalTime();
             SettingsService.Save();
 
             AppLogger.Info($"Sing-box запущен. PID={process.Id}");
 
-            return (true, "Sing-box успешно запущен.");
+            return (true, string.Empty);
         }
         catch (Exception ex)
         {
             AppLogger.Exception(ex);
+
             return (false, ex.Message);
         }
     }
@@ -117,7 +153,7 @@ public static class SingBoxRunner
 
             AppLogger.Info("Sing-box остановлен пользователем.");
 
-            return (true, "Sing-box успешно остановлен.");
+            return (true, string.Empty);
         }
         catch (Exception ex)
         {
