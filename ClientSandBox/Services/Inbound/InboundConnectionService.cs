@@ -15,9 +15,17 @@ public static class InboundConnectionService
     ];
 
     private static IInboundConnector? _currentConnector;
+
     private static InboundInfo? _currentInbound;
     public static bool IsConnected => _currentConnector?.IsConnected ?? false;
-    public static string? CurrentTag =>_currentInbound?.GetString("tag");
+
+    public static string CurrentTag => _currentInbound?.GetString("tag") ?? string.Empty;
+
+    public static string CurrentType => _currentInbound?.GetString("type") ?? string.Empty;
+
+    public static bool CanConnect => InboundService.GetSelected() is not null;
+
+
 
     /// <summary>
     /// Выполняет подключение выбранного Inbound.
@@ -72,11 +80,14 @@ public static class InboundConnectionService
     /// </summary>
     public static (bool Success, string Output) Reconnect()
     {
-        (bool Success, string Output) disconnect = Disconnect();
-
-        if (!disconnect.Success)
+        if (IsConnected)
         {
-            return disconnect;
+            var disconnect = Disconnect();
+
+            if (!disconnect.Success)
+            {
+                return disconnect;
+            }
         }
 
         return Connect();
@@ -88,5 +99,24 @@ public static class InboundConnectionService
     public static InboundInfo? GetCurrentInbound()
     {
         return _currentInbound;
+    }
+
+    /// <summary>
+    /// Возвращает информацию о текущем направлении трафика.
+    /// </summary>
+    /// <returns>Строка для отображения в интерфейсе.</returns>
+    public static string GetConnectionInfo()
+    {
+        if (_currentConnector is null ||
+            _currentInbound is null ||
+            !_currentConnector.IsConnected)
+        {
+            return "Не перенаправляется";
+        }
+
+        string tag = _currentInbound.GetString("tag") ?? "—";
+        string type = _currentInbound.GetString("type") ?? "—";
+
+        return $"{tag} ({type})";
     }
 }

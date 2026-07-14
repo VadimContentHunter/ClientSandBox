@@ -230,6 +230,7 @@ public partial class MainForm : Form
         _lastPid = pid;
 
         UpdateStatus();
+        UpdateTraffic();
         UpdateButtons();
     }
 
@@ -276,6 +277,7 @@ public partial class MainForm : Form
 
         UpdateVersion();
         UpdateStatus();
+        UpdateTraffic();
         UpdateButtons();
 
         RefreshConnections();
@@ -306,51 +308,116 @@ public partial class MainForm : Form
     {
         bool hasExe = File.Exists(txtSingBox.Text);
         bool hasConfig = File.Exists(txtConfig.Text);
+        bool canStart = hasExe && hasConfig && !SingBoxRunner.IsRunning;
+        bool canStop = SingBoxRunner.IsRunning;
 
-        bool canStart =
-            hasExe &&
-            hasConfig &&
-            !SingBoxRunner.IsRunning;
-
-        bool canStop =
-            SingBoxRunner.IsRunning;
-
-        btnCheckConfig.Enabled =
-            hasExe && hasConfig;
-
-        btnStartSingBox.Enabled =
-            canStart;
-
-        btnStopSingBox.Enabled =
-            canStop;
-
-        btnRestartSingBox.Enabled =
-            canStop;
+        btnCheckConfig.Enabled = hasExe && hasConfig;
+        btnStartSingBox.Enabled = canStart;
+        btnStopSingBox.Enabled = canStop;
+        btnRestartSingBox.Enabled = canStop;
+        btnReconnectTraffic.Enabled = SingBoxRunner.IsRunning && InboundConnectionService.CanConnect;
+        btnDisconnectTraffic.Enabled = InboundConnectionService.IsConnected;
     }
 
     private void UpdateStatus()
     {
+        if (!SingBoxRunner.IsRunning && InboundConnectionService.IsConnected)
+        {
+            InboundConnectionService.Disconnect();
+        }
+
         if (SingBoxRunner.IsRunning)
         {
             lblStatusSingBox.Text = "🟢 Запущен";
             lblPidInf.Text = SingBoxRunner.ProcessId?.ToString();
             lblStatusSingBox.ForeColor = Color.Green;
-        }
-        else
-        {
-            lblStatusSingBox.Text = "🔴 Не запущен";
+        }else{
+            lblStatusSingBox.Text = "✖ Не запущен";
             lblStatusSingBox.ForeColor = Color.Red;
             lblPidInf.Text = "—";
         }
     }
+
+    private void UpdateTraffic()
+    {
+        bool connected = InboundConnectionService.IsConnected;
+
+        lblTrafficInfo.ForeColor = connected
+            ? Color.Green
+            : Color.Red;
+
+        lblTrafficInfo.Text = connected
+            ? $"🟢 {InboundConnectionService.GetConnectionInfo()}"
+            : $"✖ {InboundConnectionService.GetConnectionInfo()}";
+    }
+
+    /// <summary>
+    /// Запускает sing-box и перенаправляет трафик.
+    /// </summary>
+    private void StartSingBox()
+    {
+        if (!ExecuteCommand(SingBoxRunner.Start, false))
+        {
+            return;
+        }
+
+        ExecuteCommand(InboundConnectionService.Connect);
+    }
+
+    /// <summary>
+    /// Останавливает перенаправление трафика и sing-box.
+    /// </summary>
+    private void StopSingBox()
+    {
+        if (!ExecuteCommand(InboundConnectionService.Disconnect, false))
+        {
+            return;
+        }
+
+        ExecuteCommand(SingBoxRunner.Stop);
+    }
+
+    /// <summary>
+    /// Перезапускает sing-box и повторно перенаправляет трафик.
+    /// </summary>
+    private void RestartSingBox()
+    {
+        if (!ExecuteCommand(InboundConnectionService.Disconnect, false))
+        {
+            return;
+        }
+
+        if (!ExecuteCommand(SingBoxRunner.Restart, false))
+        {
+            return;
+        }
+
+        ExecuteCommand(InboundConnectionService.Connect);
+    }
+
+    /// <summary>
+    /// Перенаправляет трафик через выбранный Inbound.
+    /// </summary>
+    private void ReconnectTraffic()
+    {
+        ExecuteCommand(InboundConnectionService.Reconnect);
+    }
+
+    /// <summary>
+    /// Отключает перенаправление трафика.
+    /// </summary>
+    private void DisconnectTraffic()
+    {
+        ExecuteCommand(InboundConnectionService.Disconnect);
+    }
+
 
     private static bool ShowError((bool Success, string Output) result)
     {
         if (result.Success)
             return false;
 
-        MessageBox.Show(result.Output, "Ошибка",
-            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        MessageBox.Show(result.Output, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
         return true;
     }
@@ -378,11 +445,17 @@ public partial class MainForm : Form
         notifyIcon.Visible = false;
     }
 
-    private void ExecuteCommand(Func<(bool Success, string Output)> command)
+    private bool ExecuteCommand(
+    Func<(bool Success, string Output)> command, bool refreshUi = true)
     {
-        ShowError(command());
+        (bool Success, string Output) result = command();
+        ShowError(result);
+        if (refreshUi)
+        {
+            RefreshUI();
+        }
 
-        RefreshUI();
+        return result.Success;
     }
 
     private void PathTextBox_Leave(object? sender, EventArgs e)
@@ -429,17 +502,17 @@ public partial class MainForm : Form
 
     private void btnStartSingBox_Click(object? sender, EventArgs e)
     {
-        ExecuteCommand(SingBoxRunner.Start);
+        StartSingBox();
     }
 
     private void btnStopSingBox_Click(object? sender, EventArgs e)
     {
-        ExecuteCommand(SingBoxRunner.Stop);
+        StopSingBox();
     }
 
     private void btnRestartSingBox_Click(object? sender, EventArgs e)
     {
-        ExecuteCommand(SingBoxRunner.Restart);
+        RestartSingBox();
     }
 
     private void btnCheckConfig_Click(object? sender, EventArgs e)
@@ -500,17 +573,17 @@ public partial class MainForm : Form
 
     private void miStart_Click(object sender, EventArgs e)
     {
-        ExecuteCommand(SingBoxRunner.Start);
+        StartSingBox();
     }
 
     private void miStop_Click(object sender, EventArgs e)
     {
-        ExecuteCommand(SingBoxRunner.Stop);
+        StopSingBox();
     }
 
     private void miRestart_Click(object sender, EventArgs e)
     {
-        ExecuteCommand(SingBoxRunner.Restart);
+        RestartSingBox();
     }
 
     private void miExit_Click(object sender, EventArgs e)
@@ -518,6 +591,16 @@ public partial class MainForm : Form
         _allowClose = true;
         notifyIcon.Visible = false;
         Close();
+    }
+
+    private void btnReconnectTraffic_Click(object? sender, EventArgs e)
+    {
+        ReconnectTraffic();
+    }
+
+    private void btnDisconnectTraffic_Click(object? sender, EventArgs e)
+    {
+        DisconnectTraffic();
     }
 
     private void trayMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
