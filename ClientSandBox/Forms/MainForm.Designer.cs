@@ -68,6 +68,9 @@
             colType = new DataGridViewTextBoxColumn();
             colStatus = new DataGridViewTextBoxColumn();
             colInfo = new DataGridViewTextBoxColumn();
+            cmsConnections = new ContextMenuStrip(components);
+            miEditConnection = new ToolStripMenuItem();
+            miDeleteConnection = new ToolStripMenuItem();
             fLConnectionsControlPanel = new FlowLayoutPanel();
             btnAddConnection = new Button();
             logsPage = new TabPage();
@@ -90,6 +93,7 @@
             tableStatusControl.SuspendLayout();
             tabPageConnections.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
+            cmsConnections.SuspendLayout();
             fLConnectionsControlPanel.SuspendLayout();
             trayMenu.SuspendLayout();
             SuspendLayout();
@@ -482,6 +486,7 @@
             gridConnections.AllowUserToResizeColumns = false;
             gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             gridConnections.Columns.AddRange(new DataGridViewColumn[] { colEnabled, colTag, colType, colStatus, colInfo });
+            gridConnections.ContextMenuStrip = cmsConnections;
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = SystemColors.Window;
             dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
@@ -499,6 +504,7 @@
             gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             gridConnections.Size = new Size(870, 480);
             gridConnections.TabIndex = 1;
+            gridConnections.CellMouseDown += gridConnections_CellMouseDown;
             // 
             // colEnabled
             // 
@@ -542,6 +548,24 @@
             colInfo.HeaderText = "Info";
             colInfo.Name = "colInfo";
             colInfo.ReadOnly = true;
+            // 
+            // cmsConnections
+            // 
+            cmsConnections.Items.AddRange(new ToolStripItem[] { miEditConnection, miDeleteConnection });
+            cmsConnections.Name = "cmsConnections";
+            cmsConnections.Size = new Size(155, 72);
+            // 
+            // miEditConnection
+            // 
+            miEditConnection.Name = "miEditConnection";
+            miEditConnection.Size = new Size(154, 34);
+            miEditConnection.Text = "Редактировать\n";
+            // 
+            // miDeleteConnection
+            // 
+            miDeleteConnection.Name = "miDeleteConnection";
+            miDeleteConnection.Size = new Size(154, 34);
+            miDeleteConnection.Text = "Удалить";
             // 
             // fLConnectionsControlPanel
             // 
@@ -656,6 +680,7 @@
             tabPageConnections.ResumeLayout(false);
             tabPageConnections.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
+            cmsConnections.ResumeLayout(false);
             fLConnectionsControlPanel.ResumeLayout(false);
             fLConnectionsControlPanel.PerformLayout();
             trayMenu.ResumeLayout(false);
@@ -710,5 +735,8 @@
         private DataGridViewTextBoxColumn colType;
         private DataGridViewTextBoxColumn colStatus;
         private DataGridViewTextBoxColumn colInfo;
+        private ContextMenuStrip cmsConnections;
+        private ToolStripMenuItem miEditConnection;
+        private ToolStripMenuItem miDeleteConnection;
     }
 }

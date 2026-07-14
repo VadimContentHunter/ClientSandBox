@@ -209,14 +209,26 @@ public partial class MainForm : Form
 
         foreach (ConnectionInfo connection in _connectionManager.GetConnections())
         {
-            gridConnections.Rows.Add(
+            int rowIndex = gridConnections.Rows.Add(
                 connection.IsEnabled,
                 connection.Tag,
                 connection.Type,
                 connection.Status,
                 connection.Json
             );
+
+            gridConnections.Rows[rowIndex].Tag = connection;
         }
+    }
+
+    private ConnectionInfo? GetSelectedConnection()
+    {
+        if (gridConnections.SelectedRows.Count == 0)
+        {
+            return null;
+        }
+
+        return gridConnections.SelectedRows[0].Tag as ConnectionInfo;
     }
 
     private static bool ShowError((bool Success, string Output) result)
@@ -410,15 +422,12 @@ public partial class MainForm : Form
     private void btnAddConnection_Click(object? sender, EventArgs e)
     {
         using ConnectionEditForm form = new();
-
         if (form.ShowDialog() != DialogResult.OK)
         {
             return;
         }
 
-        ConnectionValidationResult result =
-            _connectionManager.Add(form.ConnectionJson);
-
+        ConnectionValidationResult result = _connectionManager.Add(form.ConnectionJson);
         if (!result.Success)
         {
             MessageBox.Show(
@@ -430,6 +439,71 @@ public partial class MainForm : Form
             return;
         }
 
+        RefreshConnections();
+    }
+
+    private void gridConnections_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+    {
+        if (e.Button != MouseButtons.Right || e.RowIndex < 0)
+        {
+            return;
+        }
+
+        gridConnections.ClearSelection();
+        gridConnections.Rows[e.RowIndex].Selected = true;
+        gridConnections.CurrentCell = gridConnections.Rows[e.RowIndex].Cells[1];
+    }
+
+    private void miEditConnection_Click(object? sender, EventArgs e)
+    {
+        ConnectionInfo? connection = GetSelectedConnection();
+        if (connection is null)
+        {
+            return;
+        }
+
+        using ConnectionEditForm form = new();
+        form.ConnectionJson = connection.Json;
+        if (form.ShowDialog() != DialogResult.OK)
+        {
+            return;
+        }
+
+        ConnectionValidationResult result = _connectionManager.Update(connection.Id, form.ConnectionJson);
+        if (!result.Success)
+        {
+            MessageBox.Show(
+                result.Message,
+                "Ошибка",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
+            return;
+        }
+
+        RefreshConnections();
+    }
+
+    private void miDeleteConnection_Click(object? sender, EventArgs e)
+    {
+        ConnectionInfo? connection = GetSelectedConnection();
+        if (connection is null)
+        {
+            return;
+        }
+
+        DialogResult dialogResult = MessageBox.Show(
+            $"Удалить подключение \"{connection.Tag}\"?",
+            "Удаление подключения",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
+
+        if (dialogResult != DialogResult.Yes)
+        {
+            return;
+        }
+
+        _connectionManager.Delete(connection.Id);
         RefreshConnections();
     }
 }
