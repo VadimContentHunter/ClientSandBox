@@ -29,9 +29,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             tabMain = new TabControl();
             settingPage = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -61,13 +58,6 @@
             labelStatusSingBoxCaption = new Label();
             lblPidInf = new Label();
             labelPIDCaption = new Label();
-            connectionsPage = new TabPage();
-            gridConnections = new DataGridView();
-            colSelected = new DataGridViewCheckBoxColumn();
-            colTag = new DataGridViewTextBoxColumn();
-            colType = new DataGridViewTextBoxColumn();
-            colAddress = new DataGridViewTextBoxColumn();
-            colStatus = new DataGridViewTextBoxColumn();
             logsPage = new TabPage();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
@@ -86,8 +76,6 @@
             groupSingBox.SuspendLayout();
             flowLayoutSingBox.SuspendLayout();
             tableStatusControl.SuspendLayout();
-            connectionsPage.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
             trayMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -95,7 +83,6 @@
             // 
             tabMain.Controls.Add(settingPage);
             tabMain.Controls.Add(controlPage);
-            tabMain.Controls.Add(connectionsPage);
             tabMain.Controls.Add(logsPage);
             tabMain.Dock = DockStyle.Fill;
             tabMain.Location = new Point(0, 0);
@@ -460,104 +447,6 @@
             labelPIDCaption.Text = "PID:";
             labelPIDCaption.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // connectionsPage
-            // 
-            connectionsPage.Controls.Add(gridConnections);
-            connectionsPage.Location = new Point(4, 24);
-            connectionsPage.Name = "connectionsPage";
-            connectionsPage.Padding = new Padding(3);
-            connectionsPage.Size = new Size(876, 533);
-            connectionsPage.TabIndex = 3;
-            connectionsPage.Text = "Подключения";
-            connectionsPage.UseVisualStyleBackColor = true;
-            // 
-            // gridConnections
-            // 
-            gridConnections.AllowUserToAddRows = false;
-            gridConnections.AllowUserToDeleteRows = false;
-            gridConnections.AllowUserToResizeRows = false;
-            gridConnections.BackgroundColor = SystemColors.Window;
-            gridConnections.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Window;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Window;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            gridConnections.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            gridConnections.Columns.AddRange(new DataGridViewColumn[] { colSelected, colTag, colType, colAddress, colStatus });
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Window;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.GradientInactiveCaption;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            gridConnections.DefaultCellStyle = dataGridViewCellStyle2;
-            gridConnections.Dock = DockStyle.Fill;
-            gridConnections.EnableHeadersVisualStyles = false;
-            gridConnections.Location = new Point(3, 3);
-            gridConnections.MultiSelect = false;
-            gridConnections.Name = "gridConnections";
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Window;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            gridConnections.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            gridConnections.RowHeadersVisible = false;
-            gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            gridConnections.Size = new Size(870, 527);
-            gridConnections.TabIndex = 1;
-            // 
-            // colSelected
-            // 
-            colSelected.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colSelected.HeaderText = "☑";
-            colSelected.MinimumWidth = 55;
-            colSelected.Name = "colSelected";
-            colSelected.Resizable = DataGridViewTriState.False;
-            colSelected.Width = 55;
-            // 
-            // colTag
-            // 
-            colTag.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colTag.HeaderText = "Tag";
-            colTag.MinimumWidth = 120;
-            colTag.Name = "colTag";
-            colTag.ReadOnly = true;
-            colTag.Width = 150;
-            // 
-            // colType
-            // 
-            colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colType.HeaderText = "Тип";
-            colType.MinimumWidth = 90;
-            colType.Name = "colType";
-            colType.ReadOnly = true;
-            colType.Width = 90;
-            // 
-            // colAddress
-            // 
-            colAddress.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colAddress.HeaderText = "Адрес подключения";
-            colAddress.MinimumWidth = 200;
-            colAddress.Name = "colAddress";
-            colAddress.ReadOnly = true;
-            colAddress.Width = 250;
-            // 
-            // colStatus
-            // 
-            colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            colStatus.HeaderText = "Состояние";
-            colStatus.MinimumWidth = 180;
-            colStatus.Name = "colStatus";
-            colStatus.ReadOnly = true;
-            // 
             // logsPage
             // 
             logsPage.Location = new Point(4, 24);
@@ -646,8 +535,6 @@
             flowLayoutSingBox.PerformLayout();
             tableStatusControl.ResumeLayout(false);
             tableStatusControl.PerformLayout();
-            connectionsPage.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)gridConnections).EndInit();
             trayMenu.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -691,12 +578,5 @@
         private ToolStripMenuItem miStop;
         private ToolStripMenuItem miRestart;
         private ToolStripMenuItem miExit;
-        private TabPage connectionsPage;
-        private DataGridView gridConnections;
-        private DataGridViewCheckBoxColumn colSelected;
-        private DataGridViewTextBoxColumn colTag;
-        private DataGridViewTextBoxColumn colType;
-        private DataGridViewTextBoxColumn colAddress;
-        private DataGridViewTextBoxColumn colStatus;
     }
 }
