@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace ClientSandBox.Services;
+namespace ClientSandBox.Services.SingBox;
 
 public static class SingBoxService
 {

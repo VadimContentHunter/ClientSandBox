@@ -1,7 +1,7 @@
 ﻿using ClientSandBox.Services.AppLoggerService;
 using System.Diagnostics;
 
-namespace ClientSandBox.Services;
+namespace ClientSandBox.Services.SingBox;
 
 /// <summary>
 /// Управление процессом sing-box.
