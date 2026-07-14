@@ -16,6 +16,8 @@ public static class InboundConnectionService
 
     private static IInboundConnector? _currentConnector;
     private static InboundInfo? _currentInbound;
+    public static bool IsConnected => _currentConnector?.IsConnected ?? false;
+    public static string? CurrentTag =>_currentInbound?.GetString("tag");
 
     /// <summary>
     /// Выполняет подключение выбранного Inbound.

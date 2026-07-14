@@ -21,17 +21,28 @@ public sealed class SystemProxyConnector : IInboundConnector
     {
         string? host = inbound.GetString("listen");
         int? port = inbound.GetInt("listen_port");
-
         if (string.IsNullOrWhiteSpace(host) || port is null)
         {
             return (false, "Недостаточно данных.");
         }
 
-        return SystemProxyService.Enable(host, port.Value);
+        var result = SystemProxyService.Enable(host, port.Value);
+        if (result.Success)
+        {
+            _isConnected = true;
+        }
+
+        return result;
     }
 
     public (bool Success, string Output) Disconnect()
     {
-        return SystemProxyService.Disable();
+        var result = SystemProxyService.Disable();
+        if (result.Success)
+        {
+            _isConnected = false;
+        }
+
+        return result;
     }
 }
