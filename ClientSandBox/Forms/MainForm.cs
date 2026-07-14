@@ -109,16 +109,8 @@ public partial class MainForm : Form
             return;
         }
 
-        foreach (DataGridViewRow row in gridConnections.Rows)
-        {
-            bool isSelected = row == selectedRow;
-
-            row.Cells[SelectedColumnName].Value = isSelected;
-            if (row.Tag is InboundInfo currentInbound)
-            {
-                currentInbound.IsSelected = isSelected;
-            }
-        }
+        InboundService.Select(inbound);
+        RefreshConnections();
     }
 
     private void ApplyStatusStyle(DataGridViewRow row, InboundInfo inbound)
