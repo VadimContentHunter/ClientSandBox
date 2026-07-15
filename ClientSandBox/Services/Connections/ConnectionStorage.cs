@@ -60,6 +60,12 @@ public sealed class ConnectionStorage
     /// </summary>
     public void Save()
     {
+        string dir = Path.GetDirectoryName(FilePath) ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+        {
+            Directory.CreateDirectory(dir);
+        }
+
         string json = JsonSerializer.Serialize(_connections, JsonOptions);
         File.WriteAllText(FilePath, json);
     }

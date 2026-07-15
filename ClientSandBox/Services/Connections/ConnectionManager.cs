@@ -15,7 +15,10 @@ public sealed class ConnectionManager(ConnectionStorage storage)
 
     private readonly IReadOnlyList<IConnectionValidator> _validators =
     [
-        new RequiredFieldsValidator()
+        new RequiredFieldsValidator(),
+        new DuplicateTagValidator(),
+        new TunValidator(),
+        new SystemProxyValidator()
     ];
 
     /// <summary>
@@ -76,6 +79,7 @@ public sealed class ConnectionManager(ConnectionStorage storage)
         }
 
         _storage.Add(connection);
+        _storage.Save();
 
         return result;
     }
@@ -112,6 +116,7 @@ public sealed class ConnectionManager(ConnectionStorage storage)
         }
 
         _storage.Update(connection);
+        _storage.Save();
         return result;
     }
 
@@ -122,6 +127,7 @@ public sealed class ConnectionManager(ConnectionStorage storage)
     public void Delete(Guid id)
     {
         _storage.Delete(id);
+        _storage.Save();
     }
 
 }
