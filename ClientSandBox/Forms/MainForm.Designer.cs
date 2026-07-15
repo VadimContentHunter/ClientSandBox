@@ -560,12 +560,14 @@
             miEditConnection.Name = "miEditConnection";
             miEditConnection.Size = new Size(154, 34);
             miEditConnection.Text = "Редактировать\n";
+            miEditConnection.Click += miEditConnection_Click;
             // 
             // miDeleteConnection
             // 
             miDeleteConnection.Name = "miDeleteConnection";
             miDeleteConnection.Size = new Size(154, 34);
             miDeleteConnection.Text = "Удалить";
+            miDeleteConnection.Click += miDeleteConnection_Click;
             // 
             // fLConnectionsControlPanel
             // 
