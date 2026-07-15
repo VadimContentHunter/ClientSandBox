@@ -3,6 +3,9 @@ using ClientSandBox.Services;
 using ClientSandBox.Services.Connections;
 using ClientSandBox.Services.SingBox;
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text;
+using System.Linq;
 
 namespace ClientSandBox.Forms;
 
@@ -209,16 +212,84 @@ public partial class MainForm : Form
 
         foreach (ConnectionInfo connection in _connectionManager.GetConnections())
         {
+            string info = FormatConnectionInfo(connection.Json);
+
             int rowIndex = gridConnections.Rows.Add(
                 connection.IsEnabled,
                 connection.Tag,
                 connection.Type,
                 connection.Status,
-                connection.Json
+                info
             );
 
             gridConnections.Rows[rowIndex].Tag = connection;
         }
+    }
+
+    private static string FormatConnectionInfo(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return string.Empty;
+
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(json);
+            var sb = new StringBuilder();
+
+            foreach (JsonProperty prop in doc.RootElement.EnumerateObject())
+            {
+                string name = prop.Name;
+
+                // Пропускаем служебные поля
+                if (string.Equals(name, "tag", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(name, "type", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (sb.Length > 0)
+                    sb.Append(',');
+
+                sb.Append(name);
+                sb.Append(": ");
+
+                string value = FormatElement(prop.Value);
+                sb.Append(value);
+            }
+
+            return sb.ToString();
+        }
+        catch
+        {
+            return json;
+        }
+    }
+
+    private static string FormatElement(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Array:
+                return string.Join(',', element.EnumerateArray().Select(e => FormatElementValue(e)));
+            case JsonValueKind.Object:
+                // Для объектов сериализуем компактно без пробелов
+                return JsonSerializer.Serialize(element, new JsonSerializerOptions { WriteIndented = false });
+            default:
+                return FormatElementValue(element);
+        }
+    }
+
+    private static string FormatElementValue(JsonElement element)
+    {
+        return element.ValueKind switch
+        {
+            JsonValueKind.String => element.GetString() ?? string.Empty,
+            JsonValueKind.Number => element.GetRawText(),
+            JsonValueKind.True => "true",
+            JsonValueKind.False => "false",
+            JsonValueKind.Null => "null",
+            _ => element.GetRawText()
+        };
     }
 
     private ConnectionInfo? GetSelectedConnection()
