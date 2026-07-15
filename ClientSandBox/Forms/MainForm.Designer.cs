@@ -69,6 +69,7 @@
             colStatus = new DataGridViewTextBoxColumn();
             colInfo = new DataGridViewTextBoxColumn();
             cmsConnections = new ContextMenuStrip(components);
+            miSelectConnection = new ToolStripMenuItem();
             miEditConnection = new ToolStripMenuItem();
             miDeleteConnection = new ToolStripMenuItem();
             fLConnectionsControlPanel = new FlowLayoutPanel();
@@ -484,6 +485,7 @@
             gridConnections.AllowUserToAddRows = false;
             gridConnections.AllowUserToDeleteRows = false;
             gridConnections.AllowUserToResizeColumns = false;
+            gridConnections.AllowUserToResizeRows = false;
             gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             gridConnections.Columns.AddRange(new DataGridViewColumn[] { colEnabled, colTag, colType, colStatus, colInfo });
             gridConnections.ContextMenuStrip = cmsConnections;
@@ -499,19 +501,22 @@
             gridConnections.Location = new Point(3, 50);
             gridConnections.MultiSelect = false;
             gridConnections.Name = "gridConnections";
-            gridConnections.ReadOnly = true;
             gridConnections.RowHeadersVisible = false;
             gridConnections.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             gridConnections.Size = new Size(870, 480);
             gridConnections.TabIndex = 1;
             gridConnections.CellMouseDown += gridConnections_CellMouseDown;
+            gridConnections.CurrentCellDirtyStateChanged += gridConnections_CurrentCellDirtyStateChanged;
             // 
             // colEnabled
             // 
             colEnabled.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             colEnabled.HeaderText = "☑";
             colEnabled.Name = "colEnabled";
-            colEnabled.ReadOnly = true;
+            colEnabled.ReadOnly = false;
+            colEnabled.TrueValue = true;
+            colEnabled.FalseValue = false;
+            colEnabled.ThreeState = false;
             colEnabled.Width = 40;
             // 
             // colTag
@@ -551,9 +556,16 @@
             // 
             // cmsConnections
             // 
-            cmsConnections.Items.AddRange(new ToolStripItem[] { miEditConnection, miDeleteConnection });
+            cmsConnections.Items.AddRange(new ToolStripItem[] { miSelectConnection, miEditConnection, miDeleteConnection });
             cmsConnections.Name = "cmsConnections";
-            cmsConnections.Size = new Size(155, 72);
+            cmsConnections.Size = new Size(155, 106);
+            // 
+            // miSelectConnection
+            // 
+            miSelectConnection.Name = "miSelectConnection";
+            miSelectConnection.Size = new Size(154, 34);
+            miSelectConnection.Text = "Выбрать";
+            miSelectConnection.Click += miSelectConnection_Click;
             // 
             // miEditConnection
             // 
@@ -738,6 +750,7 @@
         private DataGridViewTextBoxColumn colStatus;
         private DataGridViewTextBoxColumn colInfo;
         private ContextMenuStrip cmsConnections;
+        private ToolStripMenuItem miSelectConnection;
         private ToolStripMenuItem miEditConnection;
         private ToolStripMenuItem miDeleteConnection;
     }

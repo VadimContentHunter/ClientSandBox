@@ -525,6 +525,121 @@ public partial class MainForm : Form
         gridConnections.CurrentCell = gridConnections.Rows[e.RowIndex].Cells[1];
     }
 
+    private void gridConnections_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        // Оставляем пустым — используем CurrentCellDirtyStateChanged для обработки чекбокса
+        // чтобы корректно получать новое значение после редактирования ячейки.
+    }
+
+    private void gridConnections_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
+    {
+        if (gridConnections.CurrentCell is null)
+            return;
+
+        if (gridConnections.CurrentCell.OwningColumn != colEnabled)
+            return;
+
+        if (gridConnections.IsCurrentCellDirty)
+        {
+            gridConnections.CommitEdit(DataGridViewDataErrorContexts.Commit);
+
+            int rowIndex = gridConnections.CurrentCell.RowIndex;
+            DataGridViewCell cell = gridConnections.Rows[rowIndex].Cells[colEnabled.Index];
+            bool enabled = false;
+            try
+            {
+                enabled = Convert.ToBoolean(cell.Value);
+            }
+            catch
+            {
+                // ignore conversion errors, treat as false
+            }
+
+            ConnectionInfo? connection = gridConnections.Rows[rowIndex].Tag as ConnectionInfo;
+            if (connection is null)
+                return;
+
+            ToggleConnectionEnabled(connection, enabled);
+        }
+    }
+
+    private void gridConnections_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0)
+            return;
+
+        ConnectionInfo? connection = gridConnections.Rows[e.RowIndex].Tag as ConnectionInfo;
+        if (connection is null)
+            return;
+
+        // Двойной клик по строке переключает состояние чекбокса
+        ToggleConnectionEnabled(connection, !connection.IsEnabled);
+    }
+
+    private void miSelectConnection_Click(object? sender, EventArgs e)
+    {
+        ConnectionInfo? connection = GetSelectedConnection();
+        if (connection is null)
+            return;
+
+        ToggleConnectionEnabled(connection, true);
+    }
+
+    private void ToggleConnectionEnabled(ConnectionInfo connection, bool enabled)
+    {
+        // Если включаем подключение
+        if (enabled)
+        {
+            // Если включаем TUN - выключаем все остальные подключения, остаётся только выбранный TUN
+            if (string.Equals(connection.Type, "tun", StringComparison.OrdinalIgnoreCase))
+            {
+                var toDisable = _connectionManager.GetConnections()
+                    .Where(other => !EqualityComparer<Guid>.Default.Equals(other.Id, connection.Id) && other.IsEnabled)
+                    .ToList();
+
+                foreach (ConnectionInfo other in toDisable)
+                {
+                    other.IsEnabled = false;
+                    _connectionStorage.Update(other);
+                }
+            }
+            else
+            {
+                // Если включаем не-TUN, то снимаем отметку со всех включённых TUN
+                var toDisableTun = _connectionManager.GetConnections()
+                    .Where(other => !EqualityComparer<Guid>.Default.Equals(other.Id, connection.Id) &&
+                                    other.IsEnabled &&
+                                    string.Equals(other.Type, "tun", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                foreach (ConnectionInfo other in toDisableTun)
+                {
+                    other.IsEnabled = false;
+                    _connectionStorage.Update(other);
+                }
+            }
+        }
+
+        connection.IsEnabled = enabled;
+        _connectionStorage.Update(connection);
+        _connectionStorage.Save();
+
+        // Обновляем UI и восстанавливаем выделение на том же подключении
+        RefreshConnections();
+
+        for (int i = 0; i < gridConnections.Rows.Count; i++)
+        {
+            if (gridConnections.Rows[i].Tag is ConnectionInfo info && EqualityComparer<Guid>.Default.Equals(info.Id, connection.Id))
+            {
+                gridConnections.ClearSelection();
+                gridConnections.Rows[i].Selected = true;
+                // Ставим текущую ячейку на чекбокс-столбец
+                gridConnections.CurrentCell = gridConnections.Rows[i].Cells[colEnabled.Index];
+                break;
+            }
+        }
+    }
+
     private void miEditConnection_Click(object? sender, EventArgs e)
     {
         ConnectionInfo? connection = GetSelectedConnection();
