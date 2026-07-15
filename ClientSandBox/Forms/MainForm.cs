@@ -181,9 +181,80 @@ public partial class MainForm : Form
     /// </summary>
     private void StartSingBox()
     {
-        if (!ExecuteCommand(SingBoxRunner.Start, false))
+        // 1) Проверяем, что выбрано хотя бы одно подключение
+        var selected = _connectionManager.GetConnections().Where(x => x.IsEnabled).ToList();
+
+        if (!selected.Any())
         {
+            MessageBox.Show(
+                "Не выбрано ни одного подключения. Выберите подключение для запуска.",
+                "Ошибка",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
             return;
+        }
+
+        // 2) Сохраняем исходный путь к конфигу
+        string originalConfig = SettingsService.Current.ConfigPath;
+
+        // 3) Формируем новый конфиг и перезаписываем оригинал, сохраняя единый бэкап
+        var builder = new ConnectionBuilder();
+        var buildResult = builder.BuildAndReplaceConfig(selected, originalConfig);
+
+        if (!buildResult.Success)
+        {
+            MessageBox.Show(buildResult.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        // 4) Применяем системный прокси при необходимости (для http/mixed)
+        var proxyApplyResult = ClientSandBox.Services.SystemProxy.SystemProxyService.ApplyProxyForSelected(selected);
+        if (proxyApplyResult.Success)
+        {
+            // nothing, proxy applied
+        }
+        else
+        {
+            // Если не найдено подходящих proxy — это не фатально, продолжаем; иначе покажем информацию
+            if (!string.Equals(proxyApplyResult.Message, "No applicable http/mixed proxy found among selected connections."))
+            {
+                MessageBox.Show($"Не удалось применить системный прокси: {proxyApplyResult.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Попробуем восстановить бекап и выйти
+                string backupPath = originalConfig + ".backup";
+                if (File.Exists(backupPath))
+                {
+                    File.Copy(backupPath, originalConfig, overwrite: true);
+                }
+
+                return;
+            }
+        }
+
+        // 5) Проверяем конфиг с помощью sing-box (CheckConfig читает Settings.Current.ConfigPath)
+        var check = SingBoxService.CheckConfig();
+        if (!check.Success)
+        {
+            MessageBox.Show($"Проверка конфигурации не пройдена: {check.Output}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            // Если проверка не пройдена, восстанавливаем бекап (если есть) и откатываем proxy
+            string backupPath = originalConfig + ".backup";
+            if (File.Exists(backupPath))
+            {
+                File.Copy(backupPath, originalConfig, overwrite: true);
+            }
+
+            ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
+
+            return;
+        }
+
+        // 6) Запускаем sing-box с обновлённым config.json
+        bool started = ExecuteCommand(SingBoxRunner.Start, false);
+
+        if (started)
+        {
+            MessageBox.Show("Sing-box запущен с обновлённым конфигом.", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 
@@ -193,6 +264,9 @@ public partial class MainForm : Form
     private void StopSingBox()
     {
         ExecuteCommand(SingBoxRunner.Stop);
+
+        // При остановке приложения восстанавливаем системный прокси если применяли
+        ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
     }
 
     /// <summary>
