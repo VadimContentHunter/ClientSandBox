@@ -65,6 +65,7 @@ public partial class MainForm : Form
         numKeepLastLines.ValueChanged += (_, _) => SaveSettings();
         numTailLinesToShow.ValueChanged += (_, _) => SaveSettings();
         btnOpenLog.Click += BtnOpenLog_Click;
+        btnClearLog.Click += BtnClearLog_Click;
 
         RefreshUI();
     }
@@ -473,6 +474,43 @@ public partial class MainForm : Form
         catch (Exception ex)
         {
             MessageBox.Show($"Не удалось открыть лог: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void BtnClearLog_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_watchedLogFile) || !File.Exists(_watchedLogFile))
+            {
+                MessageBox.Show("Файл логов не найден.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                // Трим файла до нуля байт, не удаляя его
+                using var fs = new FileStream(_watchedLogFile, FileMode.Truncate, FileAccess.Write, FileShare.ReadWrite);
+            }
+            catch
+            {
+                try
+                {
+                    // Фоллбек: перезаписать пустой строкой
+                    File.WriteAllText(_watchedLogFile, string.Empty, Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Не удалось очистить лог: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            RefreshLogViewer();
+        }
+        catch
+        {
+            // ignore
         }
     }
 

@@ -76,6 +76,8 @@
             fLConnectionsControlPanel = new FlowLayoutPanel();
             btnAddConnection = new Button();
             logsPage = new TabPage();
+            flowLayoutPanel13 = new FlowLayoutPanel();
+            btnOpenLog = new Button();
             rtbLogViewer = new RichTextBox();
             flowLayoutPanel12 = new FlowLayoutPanel();
             flowLayoutPanel7 = new FlowLayoutPanel();
@@ -90,7 +92,6 @@
             flowLayoutPanel6 = new FlowLayoutPanel();
             lblLogOutput = new Label();
             cmbLogOutput = new ComboBox();
-            btnOpenLog = new Button();
             flowLayoutPanel11 = new FlowLayoutPanel();
             flowLayoutPanel10 = new FlowLayoutPanel();
             lblKeepLastLines = new Label();
@@ -115,6 +116,7 @@
             miStop = new ToolStripMenuItem();
             miRestart = new ToolStripMenuItem();
             miExit = new ToolStripMenuItem();
+            btnClearLog = new Button();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -130,6 +132,7 @@
             cmsConnections.SuspendLayout();
             fLConnectionsControlPanel.SuspendLayout();
             logsPage.SuspendLayout();
+            flowLayoutPanel13.SuspendLayout();
             flowLayoutPanel12.SuspendLayout();
             flowLayoutPanel7.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
@@ -677,14 +680,36 @@
             logsPage.Text = "Логи";
             logsPage.UseVisualStyleBackColor = true;
             // 
+            // flowLayoutPanel13
+            // 
+            flowLayoutPanel13.AutoSize = true;
+            flowLayoutPanel13.Controls.Add(lblTimestamp);
+            flowLayoutPanel13.Controls.Add(btnOpenLog);
+            flowLayoutPanel13.Controls.Add(btnClearLog);
+            flowLayoutPanel13.Location = new Point(3, 34);
+            flowLayoutPanel13.Name = "flowLayoutPanel13";
+            flowLayoutPanel13.Size = new Size(371, 41);
+            flowLayoutPanel13.TabIndex = 30;
+            flowLayoutPanel13.WrapContents = false;
+            // 
+            // btnOpenLog
+            // 
+            btnOpenLog.AutoSize = true;
+            btnOpenLog.Location = new Point(158, 8);
+            btnOpenLog.Margin = new Padding(12, 8, 12, 8);
+            btnOpenLog.Name = "btnOpenLog";
+            btnOpenLog.Size = new Size(86, 25);
+            btnOpenLog.TabIndex = 17;
+            btnOpenLog.Text = "Открыть лог";
+            // 
             // rtbLogViewer
             // 
             rtbLogViewer.Dock = DockStyle.Fill;
-            rtbLogViewer.Location = new Point(3, 266);
+            rtbLogViewer.Location = new Point(3, 250);
             rtbLogViewer.Name = "rtbLogViewer";
             rtbLogViewer.ReadOnly = true;
             rtbLogViewer.ScrollBars = RichTextBoxScrollBars.Vertical;
-            rtbLogViewer.Size = new Size(870, 264);
+            rtbLogViewer.Size = new Size(870, 280);
             rtbLogViewer.TabIndex = 1;
             rtbLogViewer.Text = "";
             rtbLogViewer.WordWrap = false;
@@ -695,9 +720,10 @@
             flowLayoutPanel12.Controls.Add(flowLayoutPanel7);
             flowLayoutPanel12.Controls.Add(flowLayoutPanel11);
             flowLayoutPanel12.Dock = DockStyle.Top;
-            flowLayoutPanel12.Location = new Point(3, 100);
+            flowLayoutPanel12.Location = new Point(3, 116);
+            flowLayoutPanel12.Margin = new Padding(8, 12, 8, 12);
             flowLayoutPanel12.Name = "flowLayoutPanel12";
-            flowLayoutPanel12.Size = new Size(870, 166);
+            flowLayoutPanel12.Size = new Size(870, 134);
             flowLayoutPanel12.TabIndex = 29;
             // 
             // flowLayoutPanel7
@@ -709,7 +735,7 @@
             flowLayoutPanel7.FlowDirection = FlowDirection.TopDown;
             flowLayoutPanel7.Location = new Point(3, 3);
             flowLayoutPanel7.Name = "flowLayoutPanel7";
-            flowLayoutPanel7.Size = new Size(417, 160);
+            flowLayoutPanel7.Size = new Size(399, 128);
             flowLayoutPanel7.TabIndex = 24;
             flowLayoutPanel7.WrapContents = false;
             // 
@@ -719,8 +745,7 @@
             flowLayoutPanel2.Controls.Add(lblLogLevel);
             flowLayoutPanel2.Controls.Add(cmbLogLevel);
             flowLayoutPanel2.Dock = DockStyle.Fill;
-            flowLayoutPanel2.Location = new Point(12, 8);
-            flowLayoutPanel2.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel2.Location = new Point(3, 3);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Size = new Size(393, 29);
             flowLayoutPanel2.TabIndex = 19;
@@ -754,8 +779,7 @@
             flowLayoutPanel4.Controls.Add(flowLayoutPanel3);
             flowLayoutPanel4.Dock = DockStyle.Fill;
             flowLayoutPanel4.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanel4.Location = new Point(12, 53);
-            flowLayoutPanel4.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel4.Location = new Point(3, 38);
             flowLayoutPanel4.Name = "flowLayoutPanel4";
             flowLayoutPanel4.Size = new Size(393, 52);
             flowLayoutPanel4.TabIndex = 21;
@@ -763,6 +787,7 @@
             // 
             // lblLogOutputPath
             // 
+            lblLogOutputPath.Anchor = AnchorStyles.Left;
             lblLogOutputPath.AutoSize = true;
             lblLogOutputPath.Location = new Point(3, 0);
             lblLogOutputPath.Name = "lblLogOutputPath";
@@ -806,12 +831,10 @@
             flowLayoutPanel6.AutoSize = true;
             flowLayoutPanel6.Controls.Add(lblLogOutput);
             flowLayoutPanel6.Controls.Add(cmbLogOutput);
-            flowLayoutPanel6.Controls.Add(btnOpenLog);
             flowLayoutPanel6.Dock = DockStyle.Fill;
-            flowLayoutPanel6.Location = new Point(12, 121);
-            flowLayoutPanel6.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel6.Location = new Point(3, 96);
             flowLayoutPanel6.Name = "flowLayoutPanel6";
-            flowLayoutPanel6.Size = new Size(393, 31);
+            flowLayoutPanel6.Size = new Size(393, 29);
             flowLayoutPanel6.TabIndex = 23;
             flowLayoutPanel6.WrapContents = false;
             // 
@@ -819,30 +842,21 @@
             // 
             lblLogOutput.Anchor = AnchorStyles.Left;
             lblLogOutput.AutoSize = true;
-            lblLogOutput.Location = new Point(3, 8);
+            lblLogOutput.Location = new Point(3, 7);
             lblLogOutput.Name = "lblLogOutput";
             lblLogOutput.Size = new Size(80, 15);
             lblLogOutput.TabIndex = 3;
             lblLogOutput.Text = "Вывод логов:";
+            lblLogOutput.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // cmbLogOutput
             // 
-            cmbLogOutput.Dock = DockStyle.Fill;
             cmbLogOutput.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbLogOutput.Items.AddRange(new object[] { "console", "file", "custom" });
             cmbLogOutput.Location = new Point(89, 3);
             cmbLogOutput.Name = "cmbLogOutput";
             cmbLogOutput.Size = new Size(120, 23);
             cmbLogOutput.TabIndex = 4;
-            // 
-            // btnOpenLog
-            // 
-            btnOpenLog.AutoSize = true;
-            btnOpenLog.Location = new Point(215, 3);
-            btnOpenLog.Name = "btnOpenLog";
-            btnOpenLog.Size = new Size(86, 25);
-            btnOpenLog.TabIndex = 17;
-            btnOpenLog.Text = "Открыть лог";
             // 
             // flowLayoutPanel11
             // 
@@ -851,9 +865,9 @@
             flowLayoutPanel11.Controls.Add(flowLayoutPanel8);
             flowLayoutPanel11.Controls.Add(flowLayoutPanel9);
             flowLayoutPanel11.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanel11.Location = new Point(426, 3);
+            flowLayoutPanel11.Location = new Point(408, 3);
             flowLayoutPanel11.Name = "flowLayoutPanel11";
-            flowLayoutPanel11.Size = new Size(395, 135);
+            flowLayoutPanel11.Size = new Size(377, 105);
             flowLayoutPanel11.TabIndex = 28;
             flowLayoutPanel11.WrapContents = false;
             // 
@@ -863,8 +877,7 @@
             flowLayoutPanel10.Controls.Add(lblKeepLastLines);
             flowLayoutPanel10.Controls.Add(numKeepLastLines);
             flowLayoutPanel10.Dock = DockStyle.Fill;
-            flowLayoutPanel10.Location = new Point(12, 8);
-            flowLayoutPanel10.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel10.Location = new Point(3, 3);
             flowLayoutPanel10.Name = "flowLayoutPanel10";
             flowLayoutPanel10.Size = new Size(371, 29);
             flowLayoutPanel10.TabIndex = 27;
@@ -879,6 +892,7 @@
             lblKeepLastLines.Size = new Size(257, 15);
             lblKeepLastLines.TabIndex = 12;
             lblKeepLastLines.Text = "Сохранять последних строк при автоочистке:";
+            lblKeepLastLines.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // numKeepLastLines
             // 
@@ -897,8 +911,7 @@
             flowLayoutPanel8.Controls.Add(lblAutoClear);
             flowLayoutPanel8.Controls.Add(numAutoClearMinutes);
             flowLayoutPanel8.Dock = DockStyle.Fill;
-            flowLayoutPanel8.Location = new Point(12, 53);
-            flowLayoutPanel8.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel8.Location = new Point(3, 38);
             flowLayoutPanel8.Name = "flowLayoutPanel8";
             flowLayoutPanel8.Size = new Size(371, 29);
             flowLayoutPanel8.TabIndex = 25;
@@ -913,6 +926,7 @@
             lblAutoClear.Size = new Size(213, 15);
             lblAutoClear.TabIndex = 10;
             lblAutoClear.Text = "Автоочистка (минут), 0 = отключено:";
+            lblAutoClear.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // numAutoClearMinutes
             // 
@@ -929,8 +943,7 @@
             flowLayoutPanel9.Controls.Add(lblTailLines);
             flowLayoutPanel9.Controls.Add(numTailLinesToShow);
             flowLayoutPanel9.Dock = DockStyle.Fill;
-            flowLayoutPanel9.Location = new Point(12, 98);
-            flowLayoutPanel9.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel9.Location = new Point(3, 73);
             flowLayoutPanel9.Name = "flowLayoutPanel9";
             flowLayoutPanel9.Size = new Size(371, 29);
             flowLayoutPanel9.TabIndex = 26;
@@ -945,6 +958,7 @@
             lblTailLines.Size = new Size(279, 15);
             lblTailLines.TabIndex = 14;
             lblTailLines.Text = "Показывать последних строк (по умолчанию 50):";
+            lblTailLines.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // numTailLinesToShow
             // 
@@ -964,7 +978,7 @@
             flowLayoutPanel5.Controls.Add(chkAutoScroll);
             flowLayoutPanel5.Controls.Add(chkEnableLogging);
             flowLayoutPanel5.Dock = DockStyle.Top;
-            flowLayoutPanel5.Location = new Point(3, 65);
+            flowLayoutPanel5.Location = new Point(3, 81);
             flowLayoutPanel5.Name = "flowLayoutPanel5";
             flowLayoutPanel5.Size = new Size(870, 35);
             flowLayoutPanel5.TabIndex = 22;
@@ -1005,12 +1019,12 @@
             // 
             flowLayoutPanel1.AutoSize = true;
             flowLayoutPanel1.Controls.Add(lblCurrentLogFile);
-            flowLayoutPanel1.Controls.Add(lblTimestamp);
+            flowLayoutPanel1.Controls.Add(flowLayoutPanel13);
             flowLayoutPanel1.Dock = DockStyle.Top;
             flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
             flowLayoutPanel1.Location = new Point(3, 3);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(870, 62);
+            flowLayoutPanel1.Size = new Size(870, 78);
             flowLayoutPanel1.TabIndex = 19;
             flowLayoutPanel1.WrapContents = false;
             // 
@@ -1021,14 +1035,15 @@
             lblCurrentLogFile.Location = new Point(12, 8);
             lblCurrentLogFile.Margin = new Padding(12, 8, 12, 8);
             lblCurrentLogFile.Name = "lblCurrentLogFile";
-            lblCurrentLogFile.Size = new Size(122, 15);
+            lblCurrentLogFile.Size = new Size(353, 15);
             lblCurrentLogFile.TabIndex = 16;
             lblCurrentLogFile.Text = "Текущий лог: —";
             // 
             // lblTimestamp
             // 
+            lblTimestamp.Anchor = AnchorStyles.Left;
             lblTimestamp.AutoSize = true;
-            lblTimestamp.Location = new Point(12, 39);
+            lblTimestamp.Location = new Point(12, 13);
             lblTimestamp.Margin = new Padding(12, 8, 12, 8);
             lblTimestamp.Name = "lblTimestamp";
             lblTimestamp.Size = new Size(122, 15);
@@ -1083,6 +1098,16 @@
             miExit.Text = "Выход";
             miExit.Click += miExit_Click;
             // 
+            // btnClearLog
+            // 
+            btnClearLog.AutoSize = true;
+            btnClearLog.Location = new Point(268, 8);
+            btnClearLog.Margin = new Padding(12, 8, 12, 8);
+            btnClearLog.Name = "btnClearLog";
+            btnClearLog.Size = new Size(91, 25);
+            btnClearLog.TabIndex = 18;
+            btnClearLog.Text = "Очистить лог";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1121,6 +1146,8 @@
             fLConnectionsControlPanel.PerformLayout();
             logsPage.ResumeLayout(false);
             logsPage.PerformLayout();
+            flowLayoutPanel13.ResumeLayout(false);
+            flowLayoutPanel13.PerformLayout();
             flowLayoutPanel12.ResumeLayout(false);
             flowLayoutPanel12.PerformLayout();
             flowLayoutPanel7.ResumeLayout(false);
@@ -1241,5 +1268,7 @@
         private FlowLayoutPanel flowLayoutPanel8;
         private FlowLayoutPanel flowLayoutPanel12;
         private FlowLayoutPanel flowLayoutPanel11;
+        private FlowLayoutPanel flowLayoutPanel13;
+        private Button btnClearLog;
     }
 }
