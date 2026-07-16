@@ -14,4 +14,8 @@
 		<PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.9" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="SystemProxy\" />
+	</ItemGroup>
+
 </Project>

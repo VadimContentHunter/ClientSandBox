@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using ClientSandBox.Models;
 using ClientSandBox.Services.Connections;
@@ -19,12 +18,6 @@ public static class SystemProxyService
     private static string? _oldProxyServer;
     private static string? _oldProxyOverride;
     private static bool _applied = false;
-
-    private const int INTERNET_OPTION_SETTINGS_CHANGED = 39;
-    private const int INTERNET_OPTION_REFRESH = 37;
-
-    [DllImport("wininet.dll", SetLastError = true)]
-    private static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
 
     /// <summary>
     /// Применяет системный proxy на основании первого подходящего connection (type == http|mixed).
@@ -58,12 +51,12 @@ public static class SystemProxyService
                     continue;
 
                 string? listen = parser.GetString(doc, "listen");
-                string? port = parser.GetString(doc, "listen_port");
+                int? port = parser.GetInt(doc, "listen_port");
 
-                if (string.IsNullOrWhiteSpace(listen) || string.IsNullOrWhiteSpace(port))
+                if (string.IsNullOrWhiteSpace(listen) || port is null)
                     continue;
 
-                string proxy = $"{listen}:{port}";
+                string proxy = $"{listen}:{port.Value}";
 
                 return ApplyProxy(proxy);
             }
@@ -117,32 +110,102 @@ public static class SystemProxyService
 
     /// <summary>
     /// Восстанавливает сохранённые настройки proxy, если применялись.
+    /// При отсутствии сохранённых значений удаляет ProxyServer/ProxyOverride если ProxyEnable==0.
     /// </summary>
     public static (bool Success, string Message) Restore()
     {
-        if (!_applied)
-            return (true, string.Empty);
-
         try
         {
             using RegistryKey key = Registry.CurrentUser.OpenSubKey(InternetSettingsKey, writable: true)!;
             if (key is null)
                 return (false, "Не удалось открыть реестр для Internet Settings.");
 
-            if (_oldProxyEnable.HasValue)
-                key.SetValue("ProxyEnable", _oldProxyEnable.Value, RegistryValueKind.DWord);
-            else
-                key.DeleteValue("ProxyEnable", throwOnMissingValue: false);
+            if (_applied)
+            {
+                if (_oldProxyEnable.HasValue)
+                    key.SetValue("ProxyEnable", _oldProxyEnable.Value, RegistryValueKind.DWord);
+                else
+                    key.DeleteValue("ProxyEnable", throwOnMissingValue: false);
 
-            if (_oldProxyServer is not null)
-                key.SetValue("ProxyServer", _oldProxyServer, RegistryValueKind.String);
-            else
+                if (_oldProxyServer is not null)
+                    key.SetValue("ProxyServer", _oldProxyServer, RegistryValueKind.String);
+                else
+                    key.DeleteValue("ProxyServer", throwOnMissingValue: false);
+
+                if (_oldProxyOverride is not null)
+                    key.SetValue("ProxyOverride", _oldProxyOverride, RegistryValueKind.String);
+                else
+                    key.DeleteValue("ProxyOverride", throwOnMissingValue: false);
+
+                RefreshInternetOptions();
+
+                _applied = false;
+
+                return (true, string.Empty);
+            }
+
+            // Если мы не применяли прокси, но в реестре остался ProxyServer при отключённом ProxyEnable,
+            // это может мешать отдельным компонентам/приложениям. Попробуем аккуратно удалить такие значения.
+            object? pe = key.GetValue("ProxyEnable");
+            int proxyEnable = pe is int i ? i : 0;
+            object? currentServer = key.GetValue("ProxyServer");
+
+            if (proxyEnable == 0 && currentServer is string server && !string.IsNullOrWhiteSpace(server))
+            {
+                try
+                {
+                    key.DeleteValue("ProxyServer", throwOnMissingValue: false);
+                    key.DeleteValue("ProxyOverride", throwOnMissingValue: false);
+                    // Оповещаем систему
+                    RefreshInternetOptions();
+                }
+                catch
+                {
+                    // Игнорируем ошибки удаления
+                }
+            }
+
+            return (true, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Утилита: включает системный прокси по хосту/порту.
+    /// </summary>
+    public static (bool Success, string Message) Enable(string host, int port)
+    {
+        if (string.IsNullOrWhiteSpace(host))
+            return (false, "Host is empty.");
+
+        return ApplyProxy($"{host}:{port}");
+    }
+
+    /// <summary>
+    /// Утилита: отключает системный прокси (удаляет ProxyServer/ProxyOverride).
+    /// </summary>
+    public static (bool Success, string Message) Disable()
+    {
+        try
+        {
+            using RegistryKey key = Registry.CurrentUser.OpenSubKey(InternetSettingsKey, writable: true)!;
+            if (key is null)
+                return (false, "Не удалось открыть реестр для Internet Settings.");
+
+            key.SetValue("ProxyEnable", 0, RegistryValueKind.DWord);
+
+            try
+            {
                 key.DeleteValue("ProxyServer", throwOnMissingValue: false);
-
-            if (_oldProxyOverride is not null)
-                key.SetValue("ProxyOverride", _oldProxyOverride, RegistryValueKind.String);
-            else
                 key.DeleteValue("ProxyOverride", throwOnMissingValue: false);
+            }
+            catch
+            {
+                // ignore
+            }
 
             RefreshInternetOptions();
 
@@ -156,10 +219,24 @@ public static class SystemProxyService
         }
     }
 
+    /// <summary>
+    /// Проверяет, включен ли системный прокси.
+    /// </summary>
+    public static bool IsEnabled()
+    {
+        using RegistryKey? key = Registry.CurrentUser.OpenSubKey(InternetSettingsKey);
+
+        if (key is null)
+            return false;
+
+        object? value = key.GetValue("ProxyEnable");
+        return value is int enabled && enabled == 1;
+    }
+
     private static void RefreshInternetOptions()
     {
         // Notify the system that the registry settings have changed
-        InternetSetOption(IntPtr.Zero, INTERNET_OPTION_SETTINGS_CHANGED, IntPtr.Zero, 0);
-        InternetSetOption(IntPtr.Zero, INTERNET_OPTION_REFRESH, IntPtr.Zero, 0);
+        NativeMethods.InternetSetOption(IntPtr.Zero, InternetOptions.INTERNET_OPTION_SETTINGS_CHANGED, IntPtr.Zero, 0);
+        NativeMethods.InternetSetOption(IntPtr.Zero, InternetOptions.INTERNET_OPTION_REFRESH, IntPtr.Zero, 0);
     }
 }

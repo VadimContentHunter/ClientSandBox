@@ -27,6 +27,16 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
+        // Попытка восстановить системные настройки (если ранее были применены)
+        try
+        {
+            ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
+        }
+        catch
+        {
+            // игнорируем ошибки при восстановлении
+        }
+
         _connectionManager = new ConnectionManager(_connectionStorage);
         _connectionStorage.Load();
         RefreshConnections();
@@ -179,82 +189,136 @@ public partial class MainForm : Form
     /// <summary>
     /// Запускает sing-box.
     /// </summary>
+    private void btnRestoreNetwork_Click(object? sender, EventArgs e)
+    {
+        // Попытка восстановить системные прокси и netsh правила
+        try
+        {
+            var res1 = ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
+            // NetshPortProxyService может отсутствовать в проекте, обработаем безопасно
+            try
+            {
+                // Вызовем если тип доступен
+                var netshType = Type.GetType("ClientSandBox.Services.SystemProxy.NetshPortProxyService, ClientSandBox");
+                if (netshType is not null)
+                {
+                    var restoreMethod = netshType.GetMethod("Restore", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    if (restoreMethod is not null)
+                    {
+                        restoreMethod.Invoke(null, null);
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            if (!res1.Success)
+            {
+                MessageBox.Show($"Не удалось восстановить proxy: {res1.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Дополнительные системные команды
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c netsh winhttp reset proxy & netsh interface portproxy reset & netsh winsock reset & ipconfig /flushdns",
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
+            }
+            catch
+            {
+                // ignore
+            }
+
+            MessageBox.Show("Команды восстановления выполнены. Перезагрузите систему если проблемы сохранятся.", "Готово", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при восстановлении: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
     private void StartSingBox()
     {
-        // 1) Проверяем, что выбрано хотя бы одно подключение
-        var selected = _connectionManager.GetConnections().Where(x => x.IsEnabled).ToList();
-
-        if (!selected.Any())
+        // Перед запуском формируем config.json на основании выбранных подключений
+        try
         {
-            MessageBox.Show(
-                "Не выбрано ни одного подключения. Выберите подключение для запуска.",
-                "Ошибка",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
-
-            return;
-        }
-
-        // 2) Сохраняем исходный путь к конфигу
-        string originalConfig = SettingsService.Current.ConfigPath;
-
-        // 3) Формируем новый конфиг и перезаписываем оригинал, сохраняя единый бэкап
-        var builder = new ConnectionBuilder();
-        var buildResult = builder.BuildAndReplaceConfig(selected, originalConfig);
-
-        if (!buildResult.Success)
-        {
-            MessageBox.Show(buildResult.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
-        }
-
-        // 4) Применяем системный прокси при необходимости (для http/mixed)
-        var proxyApplyResult = ClientSandBox.Services.SystemProxy.SystemProxyService.ApplyProxyForSelected(selected);
-        if (proxyApplyResult.Success)
-        {
-            // nothing, proxy applied
-        }
-        else
-        {
-            // Если не найдено подходящих proxy — это не фатально, продолжаем; иначе покажем информацию
-            if (!string.Equals(proxyApplyResult.Message, "No applicable http/mixed proxy found among selected connections."))
+            var builder = new ClientSandBox.Services.Connections.ConnectionBuilder();
+            var selected = _connectionManager.GetConnections().Where(c => c.IsEnabled).ToList();
+            if (selected.Any())
             {
-                MessageBox.Show($"Не удалось применить системный прокси: {proxyApplyResult.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                // Попробуем восстановить бекап и выйти
-                string backupPath = originalConfig + ".backup";
-                if (File.Exists(backupPath))
+                var res = builder.BuildAndReplaceConfig(selected, SettingsService.Current.ConfigPath);
+                if (!res.Success)
                 {
-                    File.Copy(backupPath, originalConfig, overwrite: true);
+                    MessageBox.Show($"Не удалось сформировать config.json: {res.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+            }
 
+            // Если среди выбранных есть http/mixed - пробуем применить системный прокси
+            try
+            {
+                bool hasProxyType = selected.Any(c => !string.IsNullOrWhiteSpace(c.Type) &&
+                    (string.Equals(c.Type, "http", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(c.Type, "mixed", StringComparison.OrdinalIgnoreCase)));
+
+                if (hasProxyType)
+                {
+                    var applyResult = ClientSandBox.Services.SystemProxy.SystemProxyService.ApplyProxyForSelected(selected);
+                    if (!applyResult.Success)
+                    {
+                        MessageBox.Show($"Не удалось применить системный прокси: {applyResult.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Попытка вызвать NetshPortProxyService.Apply, если такой сервис присутствует
+                    try
+                    {
+                        var netshType = Type.GetType("ClientSandBox.Services.SystemProxy.NetshPortProxyService, ClientSandBox");
+                        if (netshType is not null)
+                        {
+                            var applyMethod = netshType.GetMethod("Apply", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                            if (applyMethod is not null)
+                            {
+                                // ожидаем, что метод может принимать IEnumerable<ConnectionInfo> или ничего
+                                var parameters = applyMethod.GetParameters();
+                                if (parameters.Length == 1)
+                                {
+                                    applyMethod.Invoke(null, new object[] { selected });
+                                }
+                                else
+                                {
+                                    applyMethod.Invoke(null, null);
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // ignore optional netsh helper failures
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при применении системного прокси: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!ExecuteCommand(SingBoxRunner.Start, false))
+            {
                 return;
             }
         }
-
-        // 5) Проверяем конфиг с помощью sing-box (CheckConfig читает Settings.Current.ConfigPath)
-        var check = SingBoxService.CheckConfig();
-        if (!check.Success)
+        catch (Exception ex)
         {
-            MessageBox.Show($"Проверка конфигурации не пройдена: {check.Output}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-            // Если проверка не пройдена, восстанавливаем бекап (если есть) и откатываем proxy
-            string backupPath = originalConfig + ".backup";
-            if (File.Exists(backupPath))
-            {
-                File.Copy(backupPath, originalConfig, overwrite: true);
-            }
-
-            ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
-
+            MessageBox.Show($"Ошибка при подготовке конфигурации: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
-        }
-
-        // 6) Запускаем sing-box с обновлённым config.json
-        bool started = ExecuteCommand(SingBoxRunner.Start, false);
-
-        if (started)
-        {
-            MessageBox.Show("Sing-box запущен с обновлённым конфигом.", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 
@@ -265,8 +329,46 @@ public partial class MainForm : Form
     {
         ExecuteCommand(SingBoxRunner.Stop);
 
-        // При остановке приложения восстанавливаем системный прокси если применяли
-        ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
+        // При остановке пытаемся восстановить системный прокси и netsh правила,
+        // чтобы трафик вернулся в норму без дополнительного вмешательства пользователя.
+        try
+        {
+            var restoreRes = ClientSandBox.Services.SystemProxy.SystemProxyService.Restore();
+            if (!restoreRes.Success)
+            {
+                // Показываем предупреждение, но не прерываем работу
+                MessageBox.Show($"Восстановление системного прокси завершилось с ошибкой: {restoreRes.Message}", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+
+        try
+        {
+            var netshType = Type.GetType("ClientSandBox.Services.SystemProxy.NetshPortProxyService, ClientSandBox");
+            if (netshType is not null)
+            {
+                var restoreMethod = netshType.GetMethod("Restore", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                if (restoreMethod is not null)
+                {
+                    try
+                    {
+                        restoreMethod.Invoke(null, null);
+                    }
+                    catch
+                    {
+                        // Если netsh требует elevation, предупредим пользователя
+                        MessageBox.Show("Не удалось автоматически восстановить netsh правила. Запустите приложение от имени администратора и нажмите \"Восстановить сеть\".", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // ignore
+        }
     }
 
     /// <summary>

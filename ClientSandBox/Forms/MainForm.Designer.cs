@@ -49,6 +49,7 @@
             btnCheckConfig = new Button();
             btnOpenFolder = new Button();
             btnOpenConfig = new Button();
+            btnRestoreNetwork = new Button();
             groupSingBox = new GroupBox();
             flowLayoutSingBox = new FlowLayoutPanel();
             btnStartSingBox = new Button();
@@ -275,6 +276,7 @@
             flowLayoutGeneralControl.Controls.Add(btnCheckConfig);
             flowLayoutGeneralControl.Controls.Add(btnOpenFolder);
             flowLayoutGeneralControl.Controls.Add(btnOpenConfig);
+            flowLayoutGeneralControl.Controls.Add(btnRestoreNetwork);
             flowLayoutGeneralControl.Dock = DockStyle.Fill;
             flowLayoutGeneralControl.Location = new Point(3, 24);
             flowLayoutGeneralControl.Name = "flowLayoutGeneralControl";
@@ -317,6 +319,18 @@
             btnOpenConfig.Text = "Открыть config.json";
             btnOpenConfig.UseVisualStyleBackColor = true;
             btnOpenConfig.Click += btnOpenConfig_Click;
+            // 
+            // btnRestoreNetwork
+            // 
+            btnRestoreNetwork.AutoSize = true;
+            btnRestoreNetwork.Location = new Point(535, 11);
+            btnRestoreNetwork.Margin = new Padding(16, 3, 16, 3);
+            btnRestoreNetwork.Name = "btnRestoreNetwork";
+            btnRestoreNetwork.Size = new Size(160, 25);
+            btnRestoreNetwork.TabIndex = 8;
+            btnRestoreNetwork.Text = "Восстановить сеть";
+            btnRestoreNetwork.UseVisualStyleBackColor = true;
+            btnRestoreNetwork.Click += btnRestoreNetwork_Click;
             // 
             // groupSingBox
             // 
@@ -731,6 +745,7 @@
         private Button btnRestartSingBox;
         private Button btnOpenFolder;
         private Button btnOpenConfig;
+        private Button btnRestoreNetwork;
         private Label lblPidInf;
         private Label labelPIDCaption;
         private NotifyIcon notifyIcon;
