@@ -11,6 +11,9 @@ namespace ClientSandBox.Forms;
 
 public partial class MainForm : Form
 {
+        private System.IO.FileSystemWatcher? _logWatcher;
+        private string? _watchedLogFile;
+        private readonly object _logLock = new();
     private readonly System.Windows.Forms.Timer _statusTimer = new();
 
     private bool? _lastRunningState;
@@ -50,6 +53,18 @@ public partial class MainForm : Form
         txtSingBox.TextChanged += (_, _) => SaveSettings();
         txtConfig.TextChanged += (_, _) => SaveSettings();
         chkCloseToTray.CheckedChanged += (_, _) => SaveSettings();
+        // Log settings events
+        chkEnableLogging.CheckedChanged += (_, _) => SaveSettings();
+        cmbLogLevel.SelectedIndexChanged += (_, _) => SaveSettings();
+        cmbLogOutput.SelectedIndexChanged += (_, e) => { SaveSettings(); UpdateLogOutputVisibility(); UpdateLogViewerState(); };
+        btnBrowseLogPath.Click += BtnBrowseLogPath_Click;
+        txtLogOutputPath.TextChanged += (_, _) => SaveSettings();
+        chkClearLogsOnStart.CheckedChanged += (_, _) => SaveSettings();
+        chkAutoScroll.CheckedChanged += (_, _) => SaveSettings();
+        numAutoClearMinutes.ValueChanged += (_, _) => SaveSettings();
+        numKeepLastLines.ValueChanged += (_, _) => SaveSettings();
+        numTailLinesToShow.ValueChanged += (_, _) => SaveSettings();
+        btnOpenLog.Click += BtnOpenLog_Click;
 
         RefreshUI();
     }
@@ -59,6 +74,27 @@ public partial class MainForm : Form
         txtSingBox.Text = SettingsService.Current.SingBoxPath;
         txtConfig.Text = SettingsService.Current.ConfigPath;
         chkCloseToTray.Checked = SettingsService.Current.CloseToTray;
+        // Load log settings
+        try
+        {
+            chkEnableLogging.Checked = SettingsService.Current.EnableLogging;
+            cmbLogLevel.SelectedItem = SettingsService.Current.LogLevel;
+            cmbLogOutput.SelectedItem = SettingsService.Current.LogOutput;
+            txtLogOutputPath.Text = SettingsService.Current.LogOutputPath ?? string.Empty;
+            chkClearLogsOnStart.Checked = SettingsService.Current.ClearLogsOnStart;
+            // Auto-scroll
+            try { chkAutoScroll.Checked = SettingsService.Current.AutoScrollLogs; } catch { }
+            numAutoClearMinutes.Value = Math.Max(0, Math.Min((int)numAutoClearMinutes.Maximum, SettingsService.Current.AutoClearMinutes));
+            numKeepLastLines.Value = Math.Max(1, Math.Min((int)numKeepLastLines.Maximum, SettingsService.Current.KeepLastLinesOnAutoClear));
+            numTailLinesToShow.Value = Math.Max(1, Math.Min((int)numTailLinesToShow.Maximum, SettingsService.Current.TailLinesToShow));
+        }
+        catch
+        {
+            // ignore if controls not initialized yet
+        }
+        // Update UI visibility and viewer after loading
+        UpdateLogOutputVisibility();
+        UpdateLogViewerState();
     }
 
     private void SaveSettings()
@@ -67,9 +103,414 @@ public partial class MainForm : Form
         SettingsService.Current.ConfigPath = txtConfig.Text;
         SettingsService.Current.CloseToTray = chkCloseToTray.Checked;
 
+        // Save log settings (if controls available)
+        try
+        {
+            SettingsService.Current.EnableLogging = chkEnableLogging.Checked;
+            SettingsService.Current.LogLevel = cmbLogLevel.SelectedItem?.ToString() ?? SettingsService.Current.LogLevel;
+            SettingsService.Current.LogOutput = cmbLogOutput.SelectedItem?.ToString() ?? SettingsService.Current.LogOutput;
+            SettingsService.Current.LogOutputPath = txtLogOutputPath.Text ?? string.Empty;
+            SettingsService.Current.ClearLogsOnStart = chkClearLogsOnStart.Checked;
+                SettingsService.Current.AutoScrollLogs = chkAutoScroll.Checked;
+            SettingsService.Current.AutoClearMinutes = (int)numAutoClearMinutes.Value;
+            SettingsService.Current.KeepLastLinesOnAutoClear = (int)numKeepLastLines.Value;
+            SettingsService.Current.TailLinesToShow = (int)numTailLinesToShow.Value;
+
+            // If output is file and path empty, use default logs folder in app base dir
+            if (SettingsService.Current.LogOutput == "file")
+            {
+                if (string.IsNullOrWhiteSpace(SettingsService.Current.LogOutputPath))
+                {
+                    var defaultLogs = Path.Combine(AppContext.BaseDirectory, "logs");
+                    Directory.CreateDirectory(defaultLogs);
+                    SettingsService.Current.LogOutputPath = defaultLogs;
+                }
+                else
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(SettingsService.Current.LogOutputPath);
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+
         SettingsService.Save();
 
+        // update viewer in case output or path changed
+        UpdateLogOutputVisibility();
+        UpdateLogViewerState();
+
         //RefreshUI();
+    }
+
+    private void UpdateLogOutputVisibility()
+    {
+        try
+        {
+            var selected = cmbLogOutput.SelectedItem?.ToString() ?? SettingsService.Current.LogOutput ?? "console";
+            bool isCustom = string.Equals(selected, "custom", StringComparison.OrdinalIgnoreCase);
+            // show path only for custom
+            txtLogOutputPath.Visible = isCustom;
+            btnBrowseLogPath.Visible = isCustom;
+
+            // If file selected but path empty, show resolved default path in label
+            if (string.Equals(selected, "file", StringComparison.OrdinalIgnoreCase))
+            {
+                var path = SettingsService.Current.LogOutputPath;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    var defaultDir = Path.Combine(AppContext.BaseDirectory, "logs");
+                    var defaultFile = Path.Combine(defaultDir, "singbox.log");
+                    lblCurrentLogFile.Text = $"Текущий лог: {defaultFile}";
+                }
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private void UpdateLogViewerState()
+    {
+        try
+        {
+            // determine effective log file path
+            string output = SettingsService.Current.LogOutput ?? "console";
+            string effectivePath = string.Empty;
+            const string defaultFileName = "singbox.log";
+
+            if (string.Equals(output, "console", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(output))
+            {
+                lblCurrentLogFile.Text = "Текущий лог: (console)";
+                StopWatchingLog();
+                rtbLogViewer.Text = "Нет файлового вывода логов. Выберите вывод в файл или custom.";
+                return;
+            }
+
+            if (string.Equals(output, "file", StringComparison.OrdinalIgnoreCase))
+            {
+                var path = SettingsService.Current.LogOutputPath;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    var defaultDir = Path.Combine(AppContext.BaseDirectory, "logs");
+                    effectivePath = Path.Combine(defaultDir, defaultFileName);
+                }
+                else
+                {
+                    // if user provided a directory, use default file inside it
+                    try
+                    {
+                        if (Directory.Exists(path))
+                        {
+                            effectivePath = Path.Combine(path, defaultFileName);
+                        }
+                        else
+                        {
+                            effectivePath = path;
+                        }
+                    }
+                    catch
+                    {
+                        effectivePath = path;
+                    }
+                }
+            }
+            else if (string.Equals(output, "custom", StringComparison.OrdinalIgnoreCase))
+            {
+                effectivePath = SettingsService.Current.LogOutputPath ?? string.Empty;
+            }
+            else
+            {
+                // If output contains a filename string
+                effectivePath = SettingsService.Current.LogOutputPath ?? output;
+            }
+
+            if (string.IsNullOrWhiteSpace(effectivePath))
+            {
+                lblCurrentLogFile.Text = "Текущий лог: —";
+                StopWatchingLog();
+                rtbLogViewer.Text = "Не указан путь к файлу логов.";
+                return;
+            }
+
+            // Ensure file exists for file output
+            try
+            {
+                if (string.Equals(output, "file", StringComparison.OrdinalIgnoreCase))
+                {
+                    var dir = Path.GetDirectoryName(effectivePath);
+                    if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
+                    if (!File.Exists(effectivePath))
+                    {
+                        try { using (File.Create(effectivePath)) { } } catch { }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            lblCurrentLogFile.Text = $"Текущий лог: {effectivePath}";
+            StartWatchingLog(effectivePath);
+            RefreshLogViewer();
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private void StartWatchingLog(string path)
+    {
+        try
+        {
+            if (string.Equals(_watchedLogFile, path, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            StopWatchingLog();
+
+            _watchedLogFile = path;
+
+            var dir = Path.GetDirectoryName(path) ?? Path.GetDirectoryName(AppContext.BaseDirectory) ?? AppContext.BaseDirectory;
+            var fileName = Path.GetFileName(path);
+
+            _logWatcher = new System.IO.FileSystemWatcher(dir, fileName)
+            {
+                NotifyFilter = System.IO.NotifyFilters.LastWrite | System.IO.NotifyFilters.Size | System.IO.NotifyFilters.FileName
+            };
+            _logWatcher.Changed += LogWatcher_Changed;
+            _logWatcher.Created += LogWatcher_Changed;
+            _logWatcher.Renamed += LogWatcher_Changed;
+            _logWatcher.EnableRaisingEvents = true;
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private void StopWatchingLog()
+    {
+        try
+        {
+            if (_logWatcher is not null)
+            {
+                _logWatcher.Changed -= LogWatcher_Changed;
+                _logWatcher.Created -= LogWatcher_Changed;
+                _logWatcher.Renamed -= LogWatcher_Changed;
+                _logWatcher.EnableRaisingEvents = false;
+                _logWatcher.Dispose();
+                _logWatcher = null;
+            }
+
+            _watchedLogFile = null;
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private void LogWatcher_Changed(object? sender, System.IO.FileSystemEventArgs e)
+    {
+        // debounce briefly
+        try
+        {
+            System.Threading.Thread.Sleep(50);
+        }
+        catch { }
+
+        RefreshLogViewer();
+    }
+
+    private void RefreshLogViewer()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_watchedLogFile) || !File.Exists(_watchedLogFile))
+                return;
+
+            int lines = SettingsService.Current.TailLinesToShow > 0 ? SettingsService.Current.TailLinesToShow : (int)numTailLinesToShow.Value;
+            var tail = ReadLastLines(_watchedLogFile, lines);
+
+            // update UI on UI thread
+            string newText = string.Join(Environment.NewLine, tail);
+            if (InvokeRequired)
+            {
+                BeginInvoke(() => UpdateRtbContent(newText));
+            }
+            else
+            {
+                UpdateRtbContent(newText);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private void UpdateRtbContent(string text)
+    {
+        try
+        {
+            rtbLogViewer.SuspendLayout();
+            rtbLogViewer.Text = text;
+            bool auto = SettingsService.Current.AutoScrollLogs;
+            if (auto)
+            {
+                rtbLogViewer.SelectionStart = rtbLogViewer.TextLength;
+                rtbLogViewer.ScrollToCaret();
+            }
+            rtbLogViewer.ResumeLayout();
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private static IEnumerable<string> ReadLastLines(string path, int n)
+    {
+        try
+        {
+            var result = new List<string>();
+            if (n <= 0)
+                return result;
+
+            const int bufferSize = 8192;
+            var encoding = Encoding.UTF8;
+
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            long fileLength = fs.Length;
+            if (fileLength == 0)
+                return result;
+
+            long position = fileLength;
+            var leftover = string.Empty;
+
+            while (position > 0 && result.Count < n)
+            {
+                int readSize = (int)Math.Min(bufferSize, position);
+                position -= readSize;
+                fs.Seek(position, SeekOrigin.Begin);
+                var buffer = new byte[readSize];
+                int actuallyRead = fs.Read(buffer, 0, readSize);
+                string chunk = encoding.GetString(buffer, 0, actuallyRead);
+
+                // Prepend chunk to leftover to build continuous text
+                string combined = chunk + leftover;
+                var parts = combined.Split('\n');
+
+                // If we read from middle, the first part may be partial line — keep it as leftover for next iteration
+                leftover = parts[0];
+
+                // Process remaining parts (from 1..end)
+                for (int i = parts.Length - 1; i >= 1 && result.Count < n; i--)
+                {
+                    var line = parts[i].TrimEnd('\r');
+                    // Skip possible empty line at end
+                    if (line.Length == 0)
+                    {
+                        if (i == parts.Length - 1)
+                            continue;
+                    }
+                    result.Insert(0, line);
+                }
+            }
+
+            // After loop, leftover contains the earliest fragment (start of file to first newline)
+            if (result.Count < n && !string.IsNullOrEmpty(leftover))
+            {
+                var first = leftover.TrimEnd('\r', '\n');
+                if (first.Length > 0)
+                    result.Insert(0, first);
+            }
+
+            // Ensure we return at most n last lines
+            if (result.Count > n)
+                return result.Skip(result.Count - n).ToList();
+
+            return result;
+        }
+        catch
+        {
+            return Array.Empty<string>();
+        }
+    }
+
+    private void BtnOpenLog_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_watchedLogFile) || !File.Exists(_watchedLogFile))
+            {
+                MessageBox.Show("Файл логов не найден.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = _watchedLogFile,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось открыть лог: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void BtnBrowseLogPath_Click(object? sender, EventArgs e)
+    {
+        using var dlg = new FolderBrowserDialog();
+        dlg.Description = "Выберите папку для логов (или отмените для использования дефолтной)";
+        if (!string.IsNullOrWhiteSpace(txtLogOutputPath.Text) && Directory.Exists(txtLogOutputPath.Text))
+        {
+            dlg.SelectedPath = txtLogOutputPath.Text;
+        }
+
+        if (dlg.ShowDialog(this) == DialogResult.OK)
+        {
+            txtLogOutputPath.Text = dlg.SelectedPath;
+        }
+    }
+
+    private void UpdateLogControlsEnabled()
+    {
+        bool locked = SettingsService.Current.LockLogSettingsWhileRunning && SingBoxRunner.IsRunning;
+        // Disable or enable all log-related controls
+        try
+        {
+            chkEnableLogging.Enabled = !locked;
+            cmbLogLevel.Enabled = !locked;
+            cmbLogOutput.Enabled = !locked;
+            txtLogOutputPath.Enabled = !locked;
+            btnBrowseLogPath.Enabled = !locked;
+            chkClearLogsOnStart.Enabled = !locked;
+            numAutoClearMinutes.Enabled = !locked;
+            numKeepLastLines.Enabled = !locked;
+            numTailLinesToShow.Enabled = !locked;
+        }
+        catch
+        {
+            // ignore if controls not ready
+        }
     }
 
     private void StatusTimer_Tick(object? sender, EventArgs e)
@@ -134,6 +575,7 @@ public partial class MainForm : Form
         UpdateVersion();
         UpdateStatus();
         UpdateButtons();
+        UpdateLogControlsEnabled();
     }
 
     private void UpdateVersion()
@@ -308,6 +750,16 @@ public partial class MainForm : Form
             {
                 MessageBox.Show($"Ошибка при применении системного прокси: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
+            }
+
+            // Очистка логов перед запуском, если включена соответствующая опция
+            try
+            {
+                ClientSandBox.Services.LogSettingsService.ClearLogsOnStart();
+            }
+            catch
+            {
+                // ignore
             }
 
             if (!ExecuteCommand(SingBoxRunner.Start, false))

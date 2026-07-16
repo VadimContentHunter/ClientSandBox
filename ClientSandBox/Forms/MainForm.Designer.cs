@@ -76,6 +76,38 @@
             fLConnectionsControlPanel = new FlowLayoutPanel();
             btnAddConnection = new Button();
             logsPage = new TabPage();
+            rtbLogViewer = new RichTextBox();
+            flowLayoutPanel12 = new FlowLayoutPanel();
+            flowLayoutPanel7 = new FlowLayoutPanel();
+            flowLayoutPanel2 = new FlowLayoutPanel();
+            lblLogLevel = new Label();
+            cmbLogLevel = new ComboBox();
+            flowLayoutPanel4 = new FlowLayoutPanel();
+            lblLogOutputPath = new Label();
+            flowLayoutPanel3 = new FlowLayoutPanel();
+            txtLogOutputPath = new TextBox();
+            btnBrowseLogPath = new Button();
+            flowLayoutPanel6 = new FlowLayoutPanel();
+            lblLogOutput = new Label();
+            cmbLogOutput = new ComboBox();
+            btnOpenLog = new Button();
+            flowLayoutPanel11 = new FlowLayoutPanel();
+            flowLayoutPanel10 = new FlowLayoutPanel();
+            lblKeepLastLines = new Label();
+            numKeepLastLines = new NumericUpDown();
+            flowLayoutPanel8 = new FlowLayoutPanel();
+            lblAutoClear = new Label();
+            numAutoClearMinutes = new NumericUpDown();
+            flowLayoutPanel9 = new FlowLayoutPanel();
+            lblTailLines = new Label();
+            numTailLinesToShow = new NumericUpDown();
+            flowLayoutPanel5 = new FlowLayoutPanel();
+            chkClearLogsOnStart = new CheckBox();
+            chkAutoScroll = new CheckBox();
+            chkEnableLogging = new CheckBox();
+            flowLayoutPanel1 = new FlowLayoutPanel();
+            lblCurrentLogFile = new Label();
+            lblTimestamp = new Label();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
             miOpen = new ToolStripMenuItem();
@@ -97,6 +129,22 @@
             ((System.ComponentModel.ISupportInitialize)gridConnections).BeginInit();
             cmsConnections.SuspendLayout();
             fLConnectionsControlPanel.SuspendLayout();
+            logsPage.SuspendLayout();
+            flowLayoutPanel12.SuspendLayout();
+            flowLayoutPanel7.SuspendLayout();
+            flowLayoutPanel2.SuspendLayout();
+            flowLayoutPanel4.SuspendLayout();
+            flowLayoutPanel3.SuspendLayout();
+            flowLayoutPanel6.SuspendLayout();
+            flowLayoutPanel11.SuspendLayout();
+            flowLayoutPanel10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numKeepLastLines).BeginInit();
+            flowLayoutPanel8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numAutoClearMinutes).BeginInit();
+            flowLayoutPanel9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numTailLinesToShow).BeginInit();
+            flowLayoutPanel5.SuspendLayout();
+            flowLayoutPanel1.SuspendLayout();
             trayMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -323,7 +371,7 @@
             // btnRestoreNetwork
             // 
             btnRestoreNetwork.AutoSize = true;
-            btnRestoreNetwork.Location = new Point(535, 11);
+            btnRestoreNetwork.Location = new Point(533, 11);
             btnRestoreNetwork.Margin = new Padding(16, 3, 16, 3);
             btnRestoreNetwork.Name = "btnRestoreNetwork";
             btnRestoreNetwork.Size = new Size(160, 25);
@@ -525,12 +573,10 @@
             // colEnabled
             // 
             colEnabled.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colEnabled.FalseValue = false;
             colEnabled.HeaderText = "☑";
             colEnabled.Name = "colEnabled";
-            colEnabled.ReadOnly = false;
             colEnabled.TrueValue = true;
-            colEnabled.FalseValue = false;
-            colEnabled.ThreeState = false;
             colEnabled.Width = 40;
             // 
             // colTag
@@ -619,13 +665,375 @@
             // 
             // logsPage
             // 
+            logsPage.Controls.Add(rtbLogViewer);
+            logsPage.Controls.Add(flowLayoutPanel12);
+            logsPage.Controls.Add(flowLayoutPanel5);
+            logsPage.Controls.Add(flowLayoutPanel1);
             logsPage.Location = new Point(4, 24);
             logsPage.Name = "logsPage";
             logsPage.Padding = new Padding(3);
             logsPage.Size = new Size(876, 533);
-            logsPage.TabIndex = 2;
+            logsPage.TabIndex = 4;
             logsPage.Text = "Логи";
             logsPage.UseVisualStyleBackColor = true;
+            // 
+            // rtbLogViewer
+            // 
+            rtbLogViewer.Dock = DockStyle.Fill;
+            rtbLogViewer.Location = new Point(3, 266);
+            rtbLogViewer.Name = "rtbLogViewer";
+            rtbLogViewer.ReadOnly = true;
+            rtbLogViewer.ScrollBars = RichTextBoxScrollBars.Vertical;
+            rtbLogViewer.Size = new Size(870, 264);
+            rtbLogViewer.TabIndex = 1;
+            rtbLogViewer.Text = "";
+            rtbLogViewer.WordWrap = false;
+            // 
+            // flowLayoutPanel12
+            // 
+            flowLayoutPanel12.AutoSize = true;
+            flowLayoutPanel12.Controls.Add(flowLayoutPanel7);
+            flowLayoutPanel12.Controls.Add(flowLayoutPanel11);
+            flowLayoutPanel12.Dock = DockStyle.Top;
+            flowLayoutPanel12.Location = new Point(3, 100);
+            flowLayoutPanel12.Name = "flowLayoutPanel12";
+            flowLayoutPanel12.Size = new Size(870, 166);
+            flowLayoutPanel12.TabIndex = 29;
+            // 
+            // flowLayoutPanel7
+            // 
+            flowLayoutPanel7.AutoSize = true;
+            flowLayoutPanel7.Controls.Add(flowLayoutPanel2);
+            flowLayoutPanel7.Controls.Add(flowLayoutPanel4);
+            flowLayoutPanel7.Controls.Add(flowLayoutPanel6);
+            flowLayoutPanel7.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel7.Location = new Point(3, 3);
+            flowLayoutPanel7.Name = "flowLayoutPanel7";
+            flowLayoutPanel7.Size = new Size(417, 160);
+            flowLayoutPanel7.TabIndex = 24;
+            flowLayoutPanel7.WrapContents = false;
+            // 
+            // flowLayoutPanel2
+            // 
+            flowLayoutPanel2.AutoSize = true;
+            flowLayoutPanel2.Controls.Add(lblLogLevel);
+            flowLayoutPanel2.Controls.Add(cmbLogLevel);
+            flowLayoutPanel2.Dock = DockStyle.Fill;
+            flowLayoutPanel2.Location = new Point(12, 8);
+            flowLayoutPanel2.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel2.Name = "flowLayoutPanel2";
+            flowLayoutPanel2.Size = new Size(393, 29);
+            flowLayoutPanel2.TabIndex = 19;
+            flowLayoutPanel2.WrapContents = false;
+            // 
+            // lblLogLevel
+            // 
+            lblLogLevel.Anchor = AnchorStyles.Left;
+            lblLogLevel.AutoSize = true;
+            lblLogLevel.Location = new Point(3, 7);
+            lblLogLevel.Name = "lblLogLevel";
+            lblLogLevel.Size = new Size(91, 15);
+            lblLogLevel.TabIndex = 1;
+            lblLogLevel.Text = "Уровень логов:";
+            lblLogLevel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // cmbLogLevel
+            // 
+            cmbLogLevel.Anchor = AnchorStyles.Left;
+            cmbLogLevel.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbLogLevel.Items.AddRange(new object[] { "trace", "debug", "info", "warn", "error" });
+            cmbLogLevel.Location = new Point(100, 3);
+            cmbLogLevel.Name = "cmbLogLevel";
+            cmbLogLevel.Size = new Size(120, 23);
+            cmbLogLevel.TabIndex = 2;
+            // 
+            // flowLayoutPanel4
+            // 
+            flowLayoutPanel4.AutoSize = true;
+            flowLayoutPanel4.Controls.Add(lblLogOutputPath);
+            flowLayoutPanel4.Controls.Add(flowLayoutPanel3);
+            flowLayoutPanel4.Dock = DockStyle.Fill;
+            flowLayoutPanel4.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel4.Location = new Point(12, 53);
+            flowLayoutPanel4.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel4.Name = "flowLayoutPanel4";
+            flowLayoutPanel4.Size = new Size(393, 52);
+            flowLayoutPanel4.TabIndex = 21;
+            flowLayoutPanel4.WrapContents = false;
+            // 
+            // lblLogOutputPath
+            // 
+            lblLogOutputPath.AutoSize = true;
+            lblLogOutputPath.Location = new Point(3, 0);
+            lblLogOutputPath.Name = "lblLogOutputPath";
+            lblLogOutputPath.Size = new Size(180, 15);
+            lblLogOutputPath.TabIndex = 5;
+            lblLogOutputPath.Text = "Путь вывода (если file/custom):";
+            // 
+            // flowLayoutPanel3
+            // 
+            flowLayoutPanel3.AutoSize = true;
+            flowLayoutPanel3.Controls.Add(txtLogOutputPath);
+            flowLayoutPanel3.Controls.Add(btnBrowseLogPath);
+            flowLayoutPanel3.Dock = DockStyle.Fill;
+            flowLayoutPanel3.Location = new Point(3, 18);
+            flowLayoutPanel3.Name = "flowLayoutPanel3";
+            flowLayoutPanel3.Size = new Size(387, 31);
+            flowLayoutPanel3.TabIndex = 20;
+            // 
+            // txtLogOutputPath
+            // 
+            txtLogOutputPath.Anchor = AnchorStyles.Left;
+            txtLogOutputPath.Location = new Point(3, 4);
+            txtLogOutputPath.Name = "txtLogOutputPath";
+            txtLogOutputPath.Size = new Size(300, 23);
+            txtLogOutputPath.TabIndex = 6;
+            txtLogOutputPath.Visible = false;
+            // 
+            // btnBrowseLogPath
+            // 
+            btnBrowseLogPath.Anchor = AnchorStyles.Left;
+            btnBrowseLogPath.AutoSize = true;
+            btnBrowseLogPath.Location = new Point(309, 3);
+            btnBrowseLogPath.Name = "btnBrowseLogPath";
+            btnBrowseLogPath.Size = new Size(75, 25);
+            btnBrowseLogPath.TabIndex = 7;
+            btnBrowseLogPath.Text = "Обзор...";
+            btnBrowseLogPath.Visible = false;
+            // 
+            // flowLayoutPanel6
+            // 
+            flowLayoutPanel6.AutoSize = true;
+            flowLayoutPanel6.Controls.Add(lblLogOutput);
+            flowLayoutPanel6.Controls.Add(cmbLogOutput);
+            flowLayoutPanel6.Controls.Add(btnOpenLog);
+            flowLayoutPanel6.Dock = DockStyle.Fill;
+            flowLayoutPanel6.Location = new Point(12, 121);
+            flowLayoutPanel6.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel6.Name = "flowLayoutPanel6";
+            flowLayoutPanel6.Size = new Size(393, 31);
+            flowLayoutPanel6.TabIndex = 23;
+            flowLayoutPanel6.WrapContents = false;
+            // 
+            // lblLogOutput
+            // 
+            lblLogOutput.Anchor = AnchorStyles.Left;
+            lblLogOutput.AutoSize = true;
+            lblLogOutput.Location = new Point(3, 8);
+            lblLogOutput.Name = "lblLogOutput";
+            lblLogOutput.Size = new Size(80, 15);
+            lblLogOutput.TabIndex = 3;
+            lblLogOutput.Text = "Вывод логов:";
+            // 
+            // cmbLogOutput
+            // 
+            cmbLogOutput.Dock = DockStyle.Fill;
+            cmbLogOutput.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbLogOutput.Items.AddRange(new object[] { "console", "file", "custom" });
+            cmbLogOutput.Location = new Point(89, 3);
+            cmbLogOutput.Name = "cmbLogOutput";
+            cmbLogOutput.Size = new Size(120, 23);
+            cmbLogOutput.TabIndex = 4;
+            // 
+            // btnOpenLog
+            // 
+            btnOpenLog.AutoSize = true;
+            btnOpenLog.Location = new Point(215, 3);
+            btnOpenLog.Name = "btnOpenLog";
+            btnOpenLog.Size = new Size(86, 25);
+            btnOpenLog.TabIndex = 17;
+            btnOpenLog.Text = "Открыть лог";
+            // 
+            // flowLayoutPanel11
+            // 
+            flowLayoutPanel11.AutoSize = true;
+            flowLayoutPanel11.Controls.Add(flowLayoutPanel10);
+            flowLayoutPanel11.Controls.Add(flowLayoutPanel8);
+            flowLayoutPanel11.Controls.Add(flowLayoutPanel9);
+            flowLayoutPanel11.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel11.Location = new Point(426, 3);
+            flowLayoutPanel11.Name = "flowLayoutPanel11";
+            flowLayoutPanel11.Size = new Size(395, 135);
+            flowLayoutPanel11.TabIndex = 28;
+            flowLayoutPanel11.WrapContents = false;
+            // 
+            // flowLayoutPanel10
+            // 
+            flowLayoutPanel10.AutoSize = true;
+            flowLayoutPanel10.Controls.Add(lblKeepLastLines);
+            flowLayoutPanel10.Controls.Add(numKeepLastLines);
+            flowLayoutPanel10.Dock = DockStyle.Fill;
+            flowLayoutPanel10.Location = new Point(12, 8);
+            flowLayoutPanel10.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel10.Name = "flowLayoutPanel10";
+            flowLayoutPanel10.Size = new Size(371, 29);
+            flowLayoutPanel10.TabIndex = 27;
+            flowLayoutPanel10.WrapContents = false;
+            // 
+            // lblKeepLastLines
+            // 
+            lblKeepLastLines.Anchor = AnchorStyles.Left;
+            lblKeepLastLines.AutoSize = true;
+            lblKeepLastLines.Location = new Point(3, 7);
+            lblKeepLastLines.Name = "lblKeepLastLines";
+            lblKeepLastLines.Size = new Size(257, 15);
+            lblKeepLastLines.TabIndex = 12;
+            lblKeepLastLines.Text = "Сохранять последних строк при автоочистке:";
+            // 
+            // numKeepLastLines
+            // 
+            numKeepLastLines.Anchor = AnchorStyles.Left;
+            numKeepLastLines.Location = new Point(266, 3);
+            numKeepLastLines.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            numKeepLastLines.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numKeepLastLines.Name = "numKeepLastLines";
+            numKeepLastLines.Size = new Size(80, 23);
+            numKeepLastLines.TabIndex = 13;
+            numKeepLastLines.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            // 
+            // flowLayoutPanel8
+            // 
+            flowLayoutPanel8.AutoSize = true;
+            flowLayoutPanel8.Controls.Add(lblAutoClear);
+            flowLayoutPanel8.Controls.Add(numAutoClearMinutes);
+            flowLayoutPanel8.Dock = DockStyle.Fill;
+            flowLayoutPanel8.Location = new Point(12, 53);
+            flowLayoutPanel8.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel8.Name = "flowLayoutPanel8";
+            flowLayoutPanel8.Size = new Size(371, 29);
+            flowLayoutPanel8.TabIndex = 25;
+            flowLayoutPanel8.WrapContents = false;
+            // 
+            // lblAutoClear
+            // 
+            lblAutoClear.Anchor = AnchorStyles.Left;
+            lblAutoClear.AutoSize = true;
+            lblAutoClear.Location = new Point(3, 7);
+            lblAutoClear.Name = "lblAutoClear";
+            lblAutoClear.Size = new Size(213, 15);
+            lblAutoClear.TabIndex = 10;
+            lblAutoClear.Text = "Автоочистка (минут), 0 = отключено:";
+            // 
+            // numAutoClearMinutes
+            // 
+            numAutoClearMinutes.Anchor = AnchorStyles.Left;
+            numAutoClearMinutes.Location = new Point(222, 3);
+            numAutoClearMinutes.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            numAutoClearMinutes.Name = "numAutoClearMinutes";
+            numAutoClearMinutes.Size = new Size(80, 23);
+            numAutoClearMinutes.TabIndex = 11;
+            // 
+            // flowLayoutPanel9
+            // 
+            flowLayoutPanel9.AutoSize = true;
+            flowLayoutPanel9.Controls.Add(lblTailLines);
+            flowLayoutPanel9.Controls.Add(numTailLinesToShow);
+            flowLayoutPanel9.Dock = DockStyle.Fill;
+            flowLayoutPanel9.Location = new Point(12, 98);
+            flowLayoutPanel9.Margin = new Padding(12, 8, 12, 8);
+            flowLayoutPanel9.Name = "flowLayoutPanel9";
+            flowLayoutPanel9.Size = new Size(371, 29);
+            flowLayoutPanel9.TabIndex = 26;
+            flowLayoutPanel9.WrapContents = false;
+            // 
+            // lblTailLines
+            // 
+            lblTailLines.Anchor = AnchorStyles.Left;
+            lblTailLines.AutoSize = true;
+            lblTailLines.Location = new Point(3, 7);
+            lblTailLines.Name = "lblTailLines";
+            lblTailLines.Size = new Size(279, 15);
+            lblTailLines.TabIndex = 14;
+            lblTailLines.Text = "Показывать последних строк (по умолчанию 50):";
+            // 
+            // numTailLinesToShow
+            // 
+            numTailLinesToShow.Anchor = AnchorStyles.Left;
+            numTailLinesToShow.Location = new Point(288, 3);
+            numTailLinesToShow.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            numTailLinesToShow.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numTailLinesToShow.Name = "numTailLinesToShow";
+            numTailLinesToShow.Size = new Size(80, 23);
+            numTailLinesToShow.TabIndex = 15;
+            numTailLinesToShow.Value = new decimal(new int[] { 50, 0, 0, 0 });
+            // 
+            // flowLayoutPanel5
+            // 
+            flowLayoutPanel5.AutoSize = true;
+            flowLayoutPanel5.Controls.Add(chkClearLogsOnStart);
+            flowLayoutPanel5.Controls.Add(chkAutoScroll);
+            flowLayoutPanel5.Controls.Add(chkEnableLogging);
+            flowLayoutPanel5.Dock = DockStyle.Top;
+            flowLayoutPanel5.Location = new Point(3, 65);
+            flowLayoutPanel5.Name = "flowLayoutPanel5";
+            flowLayoutPanel5.Size = new Size(870, 35);
+            flowLayoutPanel5.TabIndex = 22;
+            // 
+            // chkClearLogsOnStart
+            // 
+            chkClearLogsOnStart.AutoSize = true;
+            chkClearLogsOnStart.Location = new Point(12, 8);
+            chkClearLogsOnStart.Margin = new Padding(12, 8, 12, 8);
+            chkClearLogsOnStart.Name = "chkClearLogsOnStart";
+            chkClearLogsOnStart.Size = new Size(224, 19);
+            chkClearLogsOnStart.TabIndex = 9;
+            chkClearLogsOnStart.Text = "Очищать логи при запуске sing-box";
+            // 
+            // chkAutoScroll
+            // 
+            chkAutoScroll.AutoSize = true;
+            chkAutoScroll.Checked = true;
+            chkAutoScroll.CheckState = CheckState.Checked;
+            chkAutoScroll.Location = new Point(260, 8);
+            chkAutoScroll.Margin = new Padding(12, 8, 12, 8);
+            chkAutoScroll.Name = "chkAutoScroll";
+            chkAutoScroll.Size = new Size(92, 19);
+            chkAutoScroll.TabIndex = 1;
+            chkAutoScroll.Text = "Автоскролл";
+            // 
+            // chkEnableLogging
+            // 
+            chkEnableLogging.AutoSize = true;
+            chkEnableLogging.Location = new Point(376, 8);
+            chkEnableLogging.Margin = new Padding(12, 8, 12, 8);
+            chkEnableLogging.Name = "chkEnableLogging";
+            chkEnableLogging.Size = new Size(156, 19);
+            chkEnableLogging.TabIndex = 0;
+            chkEnableLogging.Text = "Включить логирование";
+            // 
+            // flowLayoutPanel1
+            // 
+            flowLayoutPanel1.AutoSize = true;
+            flowLayoutPanel1.Controls.Add(lblCurrentLogFile);
+            flowLayoutPanel1.Controls.Add(lblTimestamp);
+            flowLayoutPanel1.Dock = DockStyle.Top;
+            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel1.Location = new Point(3, 3);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Size = new Size(870, 62);
+            flowLayoutPanel1.TabIndex = 19;
+            flowLayoutPanel1.WrapContents = false;
+            // 
+            // lblCurrentLogFile
+            // 
+            lblCurrentLogFile.AutoSize = true;
+            lblCurrentLogFile.Dock = DockStyle.Fill;
+            lblCurrentLogFile.Location = new Point(12, 8);
+            lblCurrentLogFile.Margin = new Padding(12, 8, 12, 8);
+            lblCurrentLogFile.Name = "lblCurrentLogFile";
+            lblCurrentLogFile.Size = new Size(122, 15);
+            lblCurrentLogFile.TabIndex = 16;
+            lblCurrentLogFile.Text = "Текущий лог: —";
+            // 
+            // lblTimestamp
+            // 
+            lblTimestamp.AutoSize = true;
+            lblTimestamp.Location = new Point(12, 39);
+            lblTimestamp.Margin = new Padding(12, 8, 12, 8);
+            lblTimestamp.Name = "lblTimestamp";
+            lblTimestamp.Size = new Size(122, 15);
+            lblTimestamp.TabIndex = 8;
+            lblTimestamp.Text = "Timestamp: включён";
             // 
             // notifyIcon
             // 
@@ -711,6 +1119,35 @@
             cmsConnections.ResumeLayout(false);
             fLConnectionsControlPanel.ResumeLayout(false);
             fLConnectionsControlPanel.PerformLayout();
+            logsPage.ResumeLayout(false);
+            logsPage.PerformLayout();
+            flowLayoutPanel12.ResumeLayout(false);
+            flowLayoutPanel12.PerformLayout();
+            flowLayoutPanel7.ResumeLayout(false);
+            flowLayoutPanel7.PerformLayout();
+            flowLayoutPanel2.ResumeLayout(false);
+            flowLayoutPanel2.PerformLayout();
+            flowLayoutPanel4.ResumeLayout(false);
+            flowLayoutPanel4.PerformLayout();
+            flowLayoutPanel3.ResumeLayout(false);
+            flowLayoutPanel3.PerformLayout();
+            flowLayoutPanel6.ResumeLayout(false);
+            flowLayoutPanel6.PerformLayout();
+            flowLayoutPanel11.ResumeLayout(false);
+            flowLayoutPanel11.PerformLayout();
+            flowLayoutPanel10.ResumeLayout(false);
+            flowLayoutPanel10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numKeepLastLines).EndInit();
+            flowLayoutPanel8.ResumeLayout(false);
+            flowLayoutPanel8.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numAutoClearMinutes).EndInit();
+            flowLayoutPanel9.ResumeLayout(false);
+            flowLayoutPanel9.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numTailLinesToShow).EndInit();
+            flowLayoutPanel5.ResumeLayout(false);
+            flowLayoutPanel5.PerformLayout();
+            flowLayoutPanel1.ResumeLayout(false);
+            flowLayoutPanel1.PerformLayout();
             trayMenu.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -748,6 +1185,30 @@
         private Button btnRestoreNetwork;
         private Label lblPidInf;
         private Label labelPIDCaption;
+        // Logs tab controls
+        private TableLayoutPanel logsTable;
+        // row panels removed; controls are placed directly on logsPage
+        private Label lblCurrentLogFile;
+        private Button btnOpenLog;
+        private RichTextBox rtbLogViewer;
+        private CheckBox chkAutoScroll;
+        private CheckBox chkEnableLogging;
+        private Label lblLogLevel;
+        private ComboBox cmbLogLevel;
+        private Label lblLogOutput;
+        private ComboBox cmbLogOutput;
+        private Label lblLogOutputPath;
+        private TextBox txtLogOutputPath;
+        private Button btnBrowseLogPath;
+        private Label lblTimestamp;
+        private CheckBox chkClearLogsOnStart;
+        private Label lblAutoClear;
+        private NumericUpDown numAutoClearMinutes;
+        private Label lblKeepLastLines;
+        private NumericUpDown numKeepLastLines;
+        private Label lblTailLines;
+        private NumericUpDown numTailLinesToShow;
+
         private NotifyIcon notifyIcon;
         private ContextMenuStrip trayMenu;
         private ToolStripMenuItem miOpen;
@@ -768,5 +1229,17 @@
         private ToolStripMenuItem miSelectConnection;
         private ToolStripMenuItem miEditConnection;
         private ToolStripMenuItem miDeleteConnection;
+        private FlowLayoutPanel flowLayoutPanel1;
+        private FlowLayoutPanel flowLayoutPanel2;
+        private FlowLayoutPanel flowLayoutPanel4;
+        private FlowLayoutPanel flowLayoutPanel3;
+        private FlowLayoutPanel flowLayoutPanel5;
+        private FlowLayoutPanel flowLayoutPanel7;
+        private FlowLayoutPanel flowLayoutPanel6;
+        private FlowLayoutPanel flowLayoutPanel10;
+        private FlowLayoutPanel flowLayoutPanel9;
+        private FlowLayoutPanel flowLayoutPanel8;
+        private FlowLayoutPanel flowLayoutPanel12;
+        private FlowLayoutPanel flowLayoutPanel11;
     }
 }

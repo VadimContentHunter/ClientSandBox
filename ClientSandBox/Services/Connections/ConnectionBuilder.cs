@@ -39,6 +39,25 @@ public sealed class ConnectionBuilder
                 rootObj.Remove("inbounds");
             }
 
+            // Обновим секцию log на основании настроек приложения — переименовываем/перезаписываем без дублирования
+            try
+            {
+                var logNode = ClientSandBox.Services.LogSettingsService.BuildLogNode(ClientSandBox.Services.SettingsService.Current);
+                if (logNode is not null)
+                {
+                    if (rootObj.ContainsKey("log"))
+                    {
+                        rootObj.Remove("log");
+                    }
+
+                    rootObj["log"] = logNode;
+                }
+            }
+            catch
+            {
+                // ignore - если не удалось обновить лог секцию, не блокируем сборку конфигурации
+            }
+
             var inbounds = new JsonArray();
 
             foreach (ConnectionInfo conn in selectedConnections)
