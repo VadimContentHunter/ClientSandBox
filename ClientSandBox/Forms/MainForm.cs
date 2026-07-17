@@ -45,6 +45,7 @@ public partial class MainForm : Form
         RefreshConnections();
 
         LoadSettings();
+        UpdateWindowsStartup();
         notifyIcon.Icon = Icon;
         _statusTimer.Interval = 2000;
         _statusTimer.Tick += StatusTimer_Tick;
@@ -53,7 +54,7 @@ public partial class MainForm : Form
         txtSingBox.TextChanged += (_, _) => SaveSettings();
         txtConfig.TextChanged += (_, _) => SaveSettings();
         chkCloseToTray.CheckedChanged += (_, _) => SaveSettings();
-        chkStartWithWindows.CheckedChanged += (_, _) => SaveSettings();
+        chkStartWithWindows.CheckedChanged += (_, _) => { SaveSettings(); UpdateWindowsStartup(); };
         // Log settings events
         chkEnableLogging.CheckedChanged += (_, _) => SaveSettings();
         cmbLogLevel.SelectedIndexChanged += (_, _) => SaveSettings();
@@ -153,6 +154,18 @@ public partial class MainForm : Form
         UpdateLogViewerState();
 
         //RefreshUI();
+    }
+
+    private void UpdateWindowsStartup()
+    {
+        if (chkStartWithWindows.Checked)
+        {
+            WindowsStartupService.Enable();
+        }
+        else
+        {
+            WindowsStartupService.Disable();
+        }
     }
 
     private void UpdateLogOutputVisibility()
