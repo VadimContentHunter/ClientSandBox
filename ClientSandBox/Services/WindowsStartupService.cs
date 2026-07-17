@@ -13,9 +13,9 @@ public static class WindowsStartupService
             FileName = "schtasks.exe",
             Arguments = $"/Query /TN \"{TaskName}\"",
             UseShellExecute = false,
-            CreateNoWindow = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true
+            RedirectStandardError = true,
+            CreateNoWindow = true
         };
 
         using Process? process = Process.Start(startInfo);
@@ -60,8 +60,9 @@ public static class WindowsStartupService
         {
             FileName = "schtasks.exe",
             Arguments = arguments,
-            UseShellExecute = true,
-            Verb = "runas",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
             CreateNoWindow = true
         };
 
@@ -72,13 +73,25 @@ public static class WindowsStartupService
             return (false, "Не удалось запустить schtasks.exe.");
         }
 
+        string output = process.StandardOutput.ReadToEnd();
+        string error = process.StandardError.ReadToEnd();
+
         process.WaitForExit();
 
         if (process.ExitCode == 0)
         {
-            return (true, string.Empty);
+            return (true, output.Trim());
         }
 
-        return (false, $"schtasks.exe завершился с кодом {process.ExitCode}.");
+        string message = string.IsNullOrWhiteSpace(error)
+            ? output
+            : error;
+
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            message = $"schtasks.exe завершился с кодом {process.ExitCode}.";
+        }
+
+        return (false, message.Trim());
     }
 }
