@@ -29,12 +29,15 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             tabMain = new TabControl();
             settingPage = new TabPage();
+            flowLayoutPanel14 = new FlowLayoutPanel();
             chkCloseToTray = new CheckBox();
+            chkStartWithWindows = new CheckBox();
             tableSettingPaths = new TableLayoutPanel();
             btnBrowseSingBox = new Button();
             txtSingBox = new TextBox();
@@ -116,10 +119,9 @@
             miStop = new ToolStripMenuItem();
             miRestart = new ToolStripMenuItem();
             miExit = new ToolStripMenuItem();
-            chkStartWithWindows = new CheckBox();
-            flowLayoutPanel14 = new FlowLayoutPanel();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
+            flowLayoutPanel14.SuspendLayout();
             tableSettingPaths.SuspendLayout();
             controlPage.SuspendLayout();
             groupGeneralControl.SuspendLayout();
@@ -149,7 +151,6 @@
             flowLayoutPanel1.SuspendLayout();
             flowLayoutPanel13.SuspendLayout();
             trayMenu.SuspendLayout();
-            flowLayoutPanel14.SuspendLayout();
             SuspendLayout();
             // 
             // tabMain
@@ -178,6 +179,21 @@
             settingPage.Text = "Настройки";
             settingPage.UseVisualStyleBackColor = true;
             // 
+            // flowLayoutPanel14
+            // 
+            flowLayoutPanel14.AutoScroll = true;
+            flowLayoutPanel14.AutoSize = true;
+            flowLayoutPanel14.Controls.Add(chkCloseToTray);
+            flowLayoutPanel14.Controls.Add(chkStartWithWindows);
+            flowLayoutPanel14.Dock = DockStyle.Top;
+            flowLayoutPanel14.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel14.Location = new Point(3, 109);
+            flowLayoutPanel14.Name = "flowLayoutPanel14";
+            flowLayoutPanel14.Padding = new Padding(12, 8, 12, 8);
+            flowLayoutPanel14.Size = new Size(870, 102);
+            flowLayoutPanel14.TabIndex = 5;
+            flowLayoutPanel14.WrapContents = false;
+            // 
             // chkCloseToTray
             // 
             chkCloseToTray.AutoSize = true;
@@ -188,6 +204,17 @@
             chkCloseToTray.TabIndex = 3;
             chkCloseToTray.Text = "Закрывать окно в трей";
             chkCloseToTray.UseVisualStyleBackColor = true;
+            // 
+            // chkStartWithWindows
+            // 
+            chkStartWithWindows.AutoSize = true;
+            chkStartWithWindows.Location = new Point(20, 63);
+            chkStartWithWindows.Margin = new Padding(8, 12, 8, 12);
+            chkStartWithWindows.Name = "chkStartWithWindows";
+            chkStartWithWindows.Size = new Size(223, 19);
+            chkStartWithWindows.TabIndex = 4;
+            chkStartWithWindows.Text = "Запускать при включении Windows";
+            chkStartWithWindows.UseVisualStyleBackColor = true;
             // 
             // tableSettingPaths
             // 
@@ -540,14 +567,14 @@
             gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             gridConnections.Columns.AddRange(new DataGridViewColumn[] { colEnabled, colTag, colType, colStatus, colInfo });
             gridConnections.ContextMenuStrip = cmsConnections;
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = SystemColors.Window;
-            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle6.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle6.SelectionBackColor = Color.SteelBlue;
-            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
-            gridConnections.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Window;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = Color.SteelBlue;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            gridConnections.DefaultCellStyle = dataGridViewCellStyle3;
             gridConnections.Dock = DockStyle.Fill;
             gridConnections.Location = new Point(3, 50);
             gridConnections.MultiSelect = false;
@@ -579,8 +606,8 @@
             // colType
             // 
             colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            colType.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colType.DefaultCellStyle = dataGridViewCellStyle1;
             colType.HeaderText = "Type";
             colType.Name = "colType";
             colType.ReadOnly = true;
@@ -589,8 +616,8 @@
             // colStatus
             // 
             colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            colStatus.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colStatus.DefaultCellStyle = dataGridViewCellStyle2;
             colStatus.HeaderText = "Status";
             colStatus.Name = "colStatus";
             colStatus.ReadOnly = true;
@@ -1094,38 +1121,13 @@
             miExit.Text = "Выход";
             miExit.Click += miExit_Click;
             // 
-            // chkStartWithWindows
-            // 
-            chkStartWithWindows.AutoSize = true;
-            chkStartWithWindows.Location = new Point(20, 63);
-            chkStartWithWindows.Margin = new Padding(8, 12, 8, 12);
-            chkStartWithWindows.Name = "chkStartWithWindows";
-            chkStartWithWindows.Size = new Size(223, 19);
-            chkStartWithWindows.TabIndex = 4;
-            chkStartWithWindows.Text = "Запускать при включении Windows";
-            chkStartWithWindows.UseVisualStyleBackColor = true;
-            // 
-            // flowLayoutPanel14
-            // 
-            flowLayoutPanel14.AutoScroll = true;
-            flowLayoutPanel14.AutoSize = true;
-            flowLayoutPanel14.Controls.Add(chkCloseToTray);
-            flowLayoutPanel14.Controls.Add(chkStartWithWindows);
-            flowLayoutPanel14.Dock = DockStyle.Top;
-            flowLayoutPanel14.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanel14.Location = new Point(3, 109);
-            flowLayoutPanel14.Name = "flowLayoutPanel14";
-            flowLayoutPanel14.Padding = new Padding(12, 8, 12, 8);
-            flowLayoutPanel14.Size = new Size(870, 102);
-            flowLayoutPanel14.TabIndex = 5;
-            flowLayoutPanel14.WrapContents = false;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(884, 561);
             Controls.Add(tabMain);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximumSize = new Size(1200, 800);
             MinimumSize = new Size(900, 600);
             Name = "MainForm";
@@ -1134,6 +1136,8 @@
             tabMain.ResumeLayout(false);
             settingPage.ResumeLayout(false);
             settingPage.PerformLayout();
+            flowLayoutPanel14.ResumeLayout(false);
+            flowLayoutPanel14.PerformLayout();
             tableSettingPaths.ResumeLayout(false);
             tableSettingPaths.PerformLayout();
             controlPage.ResumeLayout(false);
@@ -1186,8 +1190,6 @@
             flowLayoutPanel13.ResumeLayout(false);
             flowLayoutPanel13.PerformLayout();
             trayMenu.ResumeLayout(false);
-            flowLayoutPanel14.ResumeLayout(false);
-            flowLayoutPanel14.PerformLayout();
             ResumeLayout(false);
         }
 
