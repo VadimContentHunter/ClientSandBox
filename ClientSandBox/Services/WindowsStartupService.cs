@@ -1,35 +1,84 @@
-﻿using Microsoft.Win32;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace ClientSandBox.Services;
 
 public static class WindowsStartupService
 {
-    private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-
-    private const string AppName = "ClientSandBox";
+    private const string TaskName = "ClientSandBox";
 
     public static bool IsEnabled()
     {
-        using RegistryKey? key = Registry.CurrentUser.OpenSubKey(RunKey);
-        string? value = key?.GetValue(AppName) as string;
-        return !string.IsNullOrWhiteSpace(value);
+        ProcessStartInfo startInfo = new()
+        {
+            FileName = "schtasks.exe",
+            Arguments = $"/Query /TN \"{TaskName}\"",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+
+        using Process? process = Process.Start(startInfo);
+
+        if (process is null)
+        {
+            return false;
+        }
+
+        process.WaitForExit();
+
+        return process.ExitCode == 0;
     }
 
-    public static void Enable()
+    public static (bool Success, string Output) Enable()
     {
-        string exePath = Environment.ProcessPath
+        string exePath =
+            Environment.ProcessPath
             ?? Process.GetCurrentProcess().MainModule?.FileName
-            ?? throw new InvalidOperationException("Не удалось определить путь к приложению.");
+            ?? throw new InvalidOperationException(
+                "Не удалось определить путь к приложению.");
 
-        string command = $"\"{exePath}\" --autostart";
-        using RegistryKey key = Registry.CurrentUser.CreateSubKey(RunKey);
-        key.SetValue(AppName, command);
+        string arguments =
+            $"/Create " +
+            $"/F " +
+            $"/TN \"{TaskName}\" " +
+            $"/SC ONLOGON " +
+            $"/RL HIGHEST " +
+            $"/TR \"\\\"{exePath}\\\" --autostart\"";
+
+        return Execute(arguments);
     }
 
-    public static void Disable()
+    public static (bool Success, string Output) Disable()
     {
-        using RegistryKey? key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
-        key?.DeleteValue(AppName, throwOnMissingValue: false);
+        return Execute($"/Delete /F /TN \"{TaskName}\"");
+    }
+
+    private static (bool Success, string Output) Execute(string arguments)
+    {
+        ProcessStartInfo startInfo = new()
+        {
+            FileName = "schtasks.exe",
+            Arguments = arguments,
+            UseShellExecute = true,
+            Verb = "runas",
+            CreateNoWindow = true
+        };
+
+        using Process? process = Process.Start(startInfo);
+
+        if (process is null)
+        {
+            return (false, "Не удалось запустить schtasks.exe.");
+        }
+
+        process.WaitForExit();
+
+        if (process.ExitCode == 0)
+        {
+            return (true, string.Empty);
+        }
+
+        return (false, $"schtasks.exe завершился с кодом {process.ExitCode}.");
     }
 }
