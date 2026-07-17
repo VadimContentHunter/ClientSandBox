@@ -11,9 +11,9 @@ namespace ClientSandBox.Forms;
 
 public partial class MainForm : Form
 {
-        private System.IO.FileSystemWatcher? _logWatcher;
-        private string? _watchedLogFile;
-        private readonly object _logLock = new();
+    private System.IO.FileSystemWatcher? _logWatcher;
+    private string? _watchedLogFile;
+    private readonly object _logLock = new();
     private readonly System.Windows.Forms.Timer _statusTimer = new();
 
     private bool? _lastRunningState;
@@ -53,6 +53,7 @@ public partial class MainForm : Form
         txtSingBox.TextChanged += (_, _) => SaveSettings();
         txtConfig.TextChanged += (_, _) => SaveSettings();
         chkCloseToTray.CheckedChanged += (_, _) => SaveSettings();
+        chkStartWithWindows.CheckedChanged += (_, _) => SaveSettings();
         // Log settings events
         chkEnableLogging.CheckedChanged += (_, _) => SaveSettings();
         cmbLogLevel.SelectedIndexChanged += (_, _) => SaveSettings();
@@ -75,6 +76,7 @@ public partial class MainForm : Form
         txtSingBox.Text = SettingsService.Current.SingBoxPath;
         txtConfig.Text = SettingsService.Current.ConfigPath;
         chkCloseToTray.Checked = SettingsService.Current.CloseToTray;
+        chkStartWithWindows.Checked = SettingsService.Current.StartWithWindows;
         // Load log settings
         try
         {
@@ -103,7 +105,7 @@ public partial class MainForm : Form
         SettingsService.Current.SingBoxPath = txtSingBox.Text;
         SettingsService.Current.ConfigPath = txtConfig.Text;
         SettingsService.Current.CloseToTray = chkCloseToTray.Checked;
-
+        SettingsService.Current.StartWithWindows = chkStartWithWindows.Checked;
         // Save log settings (if controls available)
         try
         {
@@ -112,7 +114,7 @@ public partial class MainForm : Form
             SettingsService.Current.LogOutput = cmbLogOutput.SelectedItem?.ToString() ?? SettingsService.Current.LogOutput;
             SettingsService.Current.LogOutputPath = txtLogOutputPath.Text ?? string.Empty;
             SettingsService.Current.ClearLogsOnStart = chkClearLogsOnStart.Checked;
-                SettingsService.Current.AutoScrollLogs = chkAutoScroll.Checked;
+            SettingsService.Current.AutoScrollLogs = chkAutoScroll.Checked;
             SettingsService.Current.AutoClearMinutes = (int)numAutoClearMinutes.Value;
             SettingsService.Current.KeepLastLinesOnAutoClear = (int)numKeepLastLines.Value;
             SettingsService.Current.TailLinesToShow = (int)numTailLinesToShow.Value;
@@ -1180,7 +1182,7 @@ public partial class MainForm : Form
     }
 
     private void gridConnections_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
-    { 
+    {
         if (e.Button != MouseButtons.Right || e.RowIndex < 0)
         {
             return;

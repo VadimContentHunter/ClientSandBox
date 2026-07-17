@@ -89,4 +89,9 @@ public class Settings
     /// Автоскролл просмотра логов в UI (если включено — при обновлении viewer прокручиваем в конец).
     /// </summary>
     public bool AutoScrollLogs { get; set; } = true;
+
+    /// <summary>
+    /// Запускать приложение вместе с Windows.
+    /// </summary>
+    public bool StartWithWindows { get; set; }
 }

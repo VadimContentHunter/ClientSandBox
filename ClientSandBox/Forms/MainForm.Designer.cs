@@ -29,12 +29,11 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             tabMain = new TabControl();
             settingPage = new TabPage();
-            tableLayoutPanel1 = new TableLayoutPanel();
             chkCloseToTray = new CheckBox();
             tableSettingPaths = new TableLayoutPanel();
             btnBrowseSingBox = new Button();
@@ -76,8 +75,6 @@
             fLConnectionsControlPanel = new FlowLayoutPanel();
             btnAddConnection = new Button();
             logsPage = new TabPage();
-            flowLayoutPanel13 = new FlowLayoutPanel();
-            btnOpenLog = new Button();
             rtbLogViewer = new RichTextBox();
             flowLayoutPanel12 = new FlowLayoutPanel();
             flowLayoutPanel7 = new FlowLayoutPanel();
@@ -108,7 +105,10 @@
             chkEnableLogging = new CheckBox();
             flowLayoutPanel1 = new FlowLayoutPanel();
             lblCurrentLogFile = new Label();
+            flowLayoutPanel13 = new FlowLayoutPanel();
             lblTimestamp = new Label();
+            btnOpenLog = new Button();
+            btnClearLog = new Button();
             notifyIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
             miOpen = new ToolStripMenuItem();
@@ -116,10 +116,10 @@
             miStop = new ToolStripMenuItem();
             miRestart = new ToolStripMenuItem();
             miExit = new ToolStripMenuItem();
-            btnClearLog = new Button();
+            chkStartWithWindows = new CheckBox();
+            flowLayoutPanel14 = new FlowLayoutPanel();
             tabMain.SuspendLayout();
             settingPage.SuspendLayout();
-            tableLayoutPanel1.SuspendLayout();
             tableSettingPaths.SuspendLayout();
             controlPage.SuspendLayout();
             groupGeneralControl.SuspendLayout();
@@ -132,7 +132,6 @@
             cmsConnections.SuspendLayout();
             fLConnectionsControlPanel.SuspendLayout();
             logsPage.SuspendLayout();
-            flowLayoutPanel13.SuspendLayout();
             flowLayoutPanel12.SuspendLayout();
             flowLayoutPanel7.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
@@ -148,7 +147,9 @@
             ((System.ComponentModel.ISupportInitialize)numTailLinesToShow).BeginInit();
             flowLayoutPanel5.SuspendLayout();
             flowLayoutPanel1.SuspendLayout();
+            flowLayoutPanel13.SuspendLayout();
             trayMenu.SuspendLayout();
+            flowLayoutPanel14.SuspendLayout();
             SuspendLayout();
             // 
             // tabMain
@@ -167,7 +168,7 @@
             // settingPage
             // 
             settingPage.AccessibleName = "";
-            settingPage.Controls.Add(tableLayoutPanel1);
+            settingPage.Controls.Add(flowLayoutPanel14);
             settingPage.Controls.Add(tableSettingPaths);
             settingPage.Location = new Point(4, 24);
             settingPage.Name = "settingPage";
@@ -177,26 +178,11 @@
             settingPage.Text = "Настройки";
             settingPage.UseVisualStyleBackColor = true;
             // 
-            // tableLayoutPanel1
-            // 
-            tableLayoutPanel1.AutoSize = true;
-            tableLayoutPanel1.ColumnCount = 1;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Controls.Add(chkCloseToTray, 0, 0);
-            tableLayoutPanel1.Dock = DockStyle.Top;
-            tableLayoutPanel1.Location = new Point(3, 109);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.Padding = new Padding(0, 20, 0, 0);
-            tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(870, 45);
-            tableLayoutPanel1.TabIndex = 5;
-            // 
             // chkCloseToTray
             // 
             chkCloseToTray.AutoSize = true;
-            chkCloseToTray.Dock = DockStyle.Left;
-            chkCloseToTray.Location = new Point(3, 23);
+            chkCloseToTray.Location = new Point(20, 20);
+            chkCloseToTray.Margin = new Padding(8, 12, 8, 12);
             chkCloseToTray.Name = "chkCloseToTray";
             chkCloseToTray.Size = new Size(151, 19);
             chkCloseToTray.TabIndex = 3;
@@ -554,14 +540,14 @@
             gridConnections.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             gridConnections.Columns.AddRange(new DataGridViewColumn[] { colEnabled, colTag, colType, colStatus, colInfo });
             gridConnections.ContextMenuStrip = cmsConnections;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Window;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle3.SelectionBackColor = Color.SteelBlue;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
-            gridConnections.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Window;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle6.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = Color.SteelBlue;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            gridConnections.DefaultCellStyle = dataGridViewCellStyle6;
             gridConnections.Dock = DockStyle.Fill;
             gridConnections.Location = new Point(3, 50);
             gridConnections.MultiSelect = false;
@@ -593,8 +579,8 @@
             // colType
             // 
             colType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            colType.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colType.DefaultCellStyle = dataGridViewCellStyle4;
             colType.HeaderText = "Type";
             colType.Name = "colType";
             colType.ReadOnly = true;
@@ -603,8 +589,8 @@
             // colStatus
             // 
             colStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            colStatus.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colStatus.DefaultCellStyle = dataGridViewCellStyle5;
             colStatus.HeaderText = "Status";
             colStatus.Name = "colStatus";
             colStatus.ReadOnly = true;
@@ -679,28 +665,6 @@
             logsPage.TabIndex = 4;
             logsPage.Text = "Логи";
             logsPage.UseVisualStyleBackColor = true;
-            // 
-            // flowLayoutPanel13
-            // 
-            flowLayoutPanel13.AutoSize = true;
-            flowLayoutPanel13.Controls.Add(lblTimestamp);
-            flowLayoutPanel13.Controls.Add(btnOpenLog);
-            flowLayoutPanel13.Controls.Add(btnClearLog);
-            flowLayoutPanel13.Location = new Point(3, 34);
-            flowLayoutPanel13.Name = "flowLayoutPanel13";
-            flowLayoutPanel13.Size = new Size(371, 41);
-            flowLayoutPanel13.TabIndex = 30;
-            flowLayoutPanel13.WrapContents = false;
-            // 
-            // btnOpenLog
-            // 
-            btnOpenLog.AutoSize = true;
-            btnOpenLog.Location = new Point(158, 8);
-            btnOpenLog.Margin = new Padding(12, 8, 12, 8);
-            btnOpenLog.Name = "btnOpenLog";
-            btnOpenLog.Size = new Size(86, 25);
-            btnOpenLog.TabIndex = 17;
-            btnOpenLog.Text = "Открыть лог";
             // 
             // rtbLogViewer
             // 
@@ -1039,6 +1003,18 @@
             lblCurrentLogFile.TabIndex = 16;
             lblCurrentLogFile.Text = "Текущий лог: —";
             // 
+            // flowLayoutPanel13
+            // 
+            flowLayoutPanel13.AutoSize = true;
+            flowLayoutPanel13.Controls.Add(lblTimestamp);
+            flowLayoutPanel13.Controls.Add(btnOpenLog);
+            flowLayoutPanel13.Controls.Add(btnClearLog);
+            flowLayoutPanel13.Location = new Point(3, 34);
+            flowLayoutPanel13.Name = "flowLayoutPanel13";
+            flowLayoutPanel13.Size = new Size(371, 41);
+            flowLayoutPanel13.TabIndex = 30;
+            flowLayoutPanel13.WrapContents = false;
+            // 
             // lblTimestamp
             // 
             lblTimestamp.Anchor = AnchorStyles.Left;
@@ -1049,6 +1025,26 @@
             lblTimestamp.Size = new Size(122, 15);
             lblTimestamp.TabIndex = 8;
             lblTimestamp.Text = "Timestamp: включён";
+            // 
+            // btnOpenLog
+            // 
+            btnOpenLog.AutoSize = true;
+            btnOpenLog.Location = new Point(158, 8);
+            btnOpenLog.Margin = new Padding(12, 8, 12, 8);
+            btnOpenLog.Name = "btnOpenLog";
+            btnOpenLog.Size = new Size(86, 25);
+            btnOpenLog.TabIndex = 17;
+            btnOpenLog.Text = "Открыть лог";
+            // 
+            // btnClearLog
+            // 
+            btnClearLog.AutoSize = true;
+            btnClearLog.Location = new Point(268, 8);
+            btnClearLog.Margin = new Padding(12, 8, 12, 8);
+            btnClearLog.Name = "btnClearLog";
+            btnClearLog.Size = new Size(91, 25);
+            btnClearLog.TabIndex = 18;
+            btnClearLog.Text = "Очистить лог";
             // 
             // notifyIcon
             // 
@@ -1098,15 +1094,31 @@
             miExit.Text = "Выход";
             miExit.Click += miExit_Click;
             // 
-            // btnClearLog
+            // chkStartWithWindows
             // 
-            btnClearLog.AutoSize = true;
-            btnClearLog.Location = new Point(268, 8);
-            btnClearLog.Margin = new Padding(12, 8, 12, 8);
-            btnClearLog.Name = "btnClearLog";
-            btnClearLog.Size = new Size(91, 25);
-            btnClearLog.TabIndex = 18;
-            btnClearLog.Text = "Очистить лог";
+            chkStartWithWindows.AutoSize = true;
+            chkStartWithWindows.Location = new Point(20, 63);
+            chkStartWithWindows.Margin = new Padding(8, 12, 8, 12);
+            chkStartWithWindows.Name = "chkStartWithWindows";
+            chkStartWithWindows.Size = new Size(223, 19);
+            chkStartWithWindows.TabIndex = 4;
+            chkStartWithWindows.Text = "Запускать при включении Windows";
+            chkStartWithWindows.UseVisualStyleBackColor = true;
+            // 
+            // flowLayoutPanel14
+            // 
+            flowLayoutPanel14.AutoScroll = true;
+            flowLayoutPanel14.AutoSize = true;
+            flowLayoutPanel14.Controls.Add(chkCloseToTray);
+            flowLayoutPanel14.Controls.Add(chkStartWithWindows);
+            flowLayoutPanel14.Dock = DockStyle.Top;
+            flowLayoutPanel14.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel14.Location = new Point(3, 109);
+            flowLayoutPanel14.Name = "flowLayoutPanel14";
+            flowLayoutPanel14.Padding = new Padding(12, 8, 12, 8);
+            flowLayoutPanel14.Size = new Size(870, 102);
+            flowLayoutPanel14.TabIndex = 5;
+            flowLayoutPanel14.WrapContents = false;
             // 
             // MainForm
             // 
@@ -1122,8 +1134,6 @@
             tabMain.ResumeLayout(false);
             settingPage.ResumeLayout(false);
             settingPage.PerformLayout();
-            tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel1.PerformLayout();
             tableSettingPaths.ResumeLayout(false);
             tableSettingPaths.PerformLayout();
             controlPage.ResumeLayout(false);
@@ -1146,8 +1156,6 @@
             fLConnectionsControlPanel.PerformLayout();
             logsPage.ResumeLayout(false);
             logsPage.PerformLayout();
-            flowLayoutPanel13.ResumeLayout(false);
-            flowLayoutPanel13.PerformLayout();
             flowLayoutPanel12.ResumeLayout(false);
             flowLayoutPanel12.PerformLayout();
             flowLayoutPanel7.ResumeLayout(false);
@@ -1175,7 +1183,11 @@
             flowLayoutPanel5.PerformLayout();
             flowLayoutPanel1.ResumeLayout(false);
             flowLayoutPanel1.PerformLayout();
+            flowLayoutPanel13.ResumeLayout(false);
+            flowLayoutPanel13.PerformLayout();
             trayMenu.ResumeLayout(false);
+            flowLayoutPanel14.ResumeLayout(false);
+            flowLayoutPanel14.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1270,5 +1282,7 @@
         private FlowLayoutPanel flowLayoutPanel11;
         private FlowLayoutPanel flowLayoutPanel13;
         private Button btnClearLog;
+        private CheckBox chkStartWithWindows;
+        private FlowLayoutPanel flowLayoutPanel14;
     }
 }
