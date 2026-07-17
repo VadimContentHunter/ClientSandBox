@@ -1,6 +1,8 @@
 using ClientSandBox.Forms;
+using ClientSandBox.Models;
 using ClientSandBox.Services;
 using ClientSandBox.Services.AppLoggerService;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -11,7 +13,7 @@ internal static class Program
     private static Mutex? _mutex;
 
     [STAThread]
-    private static void Main()
+    private static void Main(string[] args)
     {
         _mutex = new Mutex(
             initiallyOwned: true,
@@ -34,10 +36,15 @@ internal static class Program
 
         AppLogger.Initialize();
         SettingsService.Load();
+        StartMode startMode = args.Any(arg =>
+            arg.Equals("--autostart", StringComparison.OrdinalIgnoreCase))
+            ? StartMode.AutoStart
+            : StartMode.Normal;
+        bool isAutoStart = args.Any(arg => arg.Equals("--autostart", StringComparison.OrdinalIgnoreCase));
 
         try
         {
-            Application.Run(new MainForm());
+            Application.Run(new MainForm(startMode));
         }
         finally
         {

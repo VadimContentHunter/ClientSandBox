@@ -12,8 +12,11 @@ namespace ClientSandBox.Forms;
 public partial class MainForm : Form
 {
     private System.IO.FileSystemWatcher? _logWatcher;
+
     private string? _watchedLogFile;
+
     private readonly object _logLock = new();
+
     private readonly System.Windows.Forms.Timer _statusTimer = new();
 
     private bool? _lastRunningState;
@@ -26,8 +29,11 @@ public partial class MainForm : Form
 
     private readonly ConnectionManager _connectionManager;
 
-    public MainForm()
+    private readonly StartMode _startMode;
+
+    public MainForm(StartMode startMode)
     {
+        _startMode = startMode;
         InitializeComponent();
 
         // Попытка восстановить системные настройки (если ранее были применены)
@@ -70,6 +76,7 @@ public partial class MainForm : Form
         btnClearLog.Click += BtnClearLog_Click;
 
         RefreshUI();
+        Load += MainForm_Load;
     }
 
     private void LoadSettings()
@@ -1014,6 +1021,31 @@ public partial class MainForm : Form
         BringToFront();
         Activate();
         notifyIcon.Visible = false;
+    }
+
+    private void MainForm_Load(object? sender, EventArgs e)
+    {
+        if (_startMode != StartMode.AutoStart)
+        {
+            return;
+        }
+
+        WindowState = FormWindowState.Minimized;
+        Hide();
+        ShowInTaskbar = false;
+        notifyIcon.Visible = true;
+
+        StartAutoStart();
+    }
+
+    private void StartAutoStart()
+    {
+        if (!SingBoxRunner.IsRunning)
+        {
+            StartSingBox();
+        }
+        
+        RefreshUI();
     }
 
     private bool ExecuteCommand(
